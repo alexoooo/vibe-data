@@ -73,3 +73,5 @@ Then run the shaded JMH jar:
 ```bash
 java -jar benchmarks/target/benchmarks.jar
 ```
+
+Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()` directly from an IDE to launch that benchmark class without building a custom JMH command line.

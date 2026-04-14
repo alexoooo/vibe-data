@@ -5,6 +5,7 @@ import io.github.alexoooo.vibe.data.SimpleDoubleObjectPersistentSortedMap;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.Nullable;
+import org.openjdk.jmh.Main;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -25,6 +26,13 @@ import org.openjdk.jmh.infra.Blackhole;
 @Measurement(iterations = 4, time = 200, timeUnit = TimeUnit.MILLISECONDS)
 @Fork(1)
 public class DoubleObjectPersistentSortedMapBenchmark {
+
+    public static void main(String[] args) throws Exception {
+        String[] benchmarkArgs = args.length == 0
+                ? new String[]{DoubleObjectPersistentSortedMapBenchmark.class.getName() + ".*"}
+                : args;
+        Main.main(benchmarkArgs);
+    }
 
     @Benchmark
     public @Nullable String findExisting(MapState state) {

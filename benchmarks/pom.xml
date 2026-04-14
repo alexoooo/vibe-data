@@ -22,6 +22,15 @@
         </dependency>
 
         <dependency>
+            <groupId>io.github.alexoooo</groupId>
+            <artifactId>vibe-data</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.andrewoma.dexx</groupId>
             <artifactId>collection</artifactId>
         </dependency>
