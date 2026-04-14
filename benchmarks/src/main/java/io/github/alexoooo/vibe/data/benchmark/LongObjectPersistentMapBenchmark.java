@@ -113,7 +113,7 @@ public class LongObjectPersistentMapBenchmark {
     @State(Scope.Thread)
     public static class MapState {
 
-        @Param({"simple", "hamt", "dexx", "bifurcan"})
+        @Param({"simple", "hamt", "dexx", "bifurcan", "bifurcanMap"})
         public String implementation;
 
         @Param({"128", "4096"})
@@ -166,6 +166,7 @@ public class LongObjectPersistentMapBenchmark {
                 case "hamt" -> HamtLongObjectPersistentMap.<String>empty();
                 case "dexx" -> DexxLongObjectPersistentMap.<String>empty();
                 case "bifurcan" -> BifurcanIntMapLongObjectPersistentMap.<String>empty();
+                case "bifurcanMap" -> BifurcanMapLongObjectPersistentMap.<String>empty();
                 default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
             };
         }

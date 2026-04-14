@@ -106,3 +106,5 @@ java -jar benchmarks/target/benchmarks.jar
 Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()` directly from an IDE to launch that benchmark class without building a custom JMH command line.
 
 The benchmark suite includes both single-operation microbenchmarks and mixed read/write workloads across the library implementations plus benchmark-only comparison wrappers.
+
+Saved benchmark result snapshots live under `benchmarks/src/main/resources/results/` with timestamped filenames.
