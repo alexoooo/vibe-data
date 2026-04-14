@@ -22,7 +22,7 @@ On Windows, use:
 
 | Module | Purpose |
 | --- | --- |
-| `vibe-data` | Published library artifact containing the persistent map API and the simple `TreeMap`-copy implementation |
+| `vibe-data` | Published library artifact containing the persistent map API plus simple `TreeMap`-copy and primitive treap implementations |
 | `benchmarks` | JMH benchmarks plus a benchmark-only Dexx `TreeMap` comparison implementation |
 
 ## Current API
@@ -30,6 +30,7 @@ On Windows, use:
 - `DoubleObjectSortedMap<T>`
 - `DoubleObjectPersistentSortedMap<T>`
 - `SimpleDoubleObjectPersistentSortedMap<T>`
+- `TreapDoubleObjectPersistentSortedMap<T>`
 
 ## Example
 

@@ -2,6 +2,7 @@ package io.github.alexoooo.vibe.data.benchmark;
 
 import io.github.alexoooo.vibe.data.DoubleObjectPersistentSortedMap;
 import io.github.alexoooo.vibe.data.SimpleDoubleObjectPersistentSortedMap;
+import io.github.alexoooo.vibe.data.TreapDoubleObjectPersistentSortedMap;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.Nullable;
@@ -78,7 +79,8 @@ public class DoubleObjectPersistentSortedMapBenchmark {
     @State(Scope.Thread)
     public static class MapState {
 
-        @Param({"simple", "dexx"})
+//        @Param({"simple", "treap", "dexx"})
+        @Param("treap")
         public String implementation;
 
         @Param({"ascending", "descending"})
@@ -109,6 +111,9 @@ public class DoubleObjectPersistentSortedMapBenchmark {
                 case "simple" -> "descending".equals(order)
                         ? SimpleDoubleObjectPersistentSortedMap.<String>descending()
                         : SimpleDoubleObjectPersistentSortedMap.<String>ascending();
+                case "treap" -> "descending".equals(order)
+                        ? TreapDoubleObjectPersistentSortedMap.<String>descending()
+                        : TreapDoubleObjectPersistentSortedMap.<String>ascending();
                 case "dexx" -> "descending".equals(order)
                         ? DexxDoubleObjectPersistentSortedMap.<String>descending()
                         : DexxDoubleObjectPersistentSortedMap.<String>ascending();
