@@ -28,6 +28,9 @@ import org.openjdk.jmh.infra.Blackhole;
 @Fork(1)
 public class DoubleObjectPersistentSortedMapBenchmark {
 
+    private static final int MIXED_OPERATION_COUNT = 64;
+    private static final int MIXED_ITERATION_SAMPLE = 4;
+
     public static void main(String[] args) throws Exception {
         String[] benchmarkArgs = args.length == 0
                 ? new String[]{DoubleObjectPersistentSortedMapBenchmark.class.getName() + ".*"}
@@ -76,11 +79,54 @@ public class DoubleObjectPersistentSortedMapBenchmark {
         return count;
     }
 
+    @Benchmark
+    public DoubleObjectPersistentSortedMap<String> mixedReadHeavy(MapState state, Blackhole blackhole) {
+        DoubleObjectPersistentSortedMap<String> map = state.map;
+        for (int index = 0; index < MIXED_OPERATION_COUNT; index++) {
+            blackhole.consume(map.find(state.mixedExistingReadKeys[index]));
+            blackhole.consume(map.find(state.mixedMissingReadKeys[index]));
+
+            if ((index & 7) == 0) {
+                Iterator<String> iterator = map.greaterOrEqualTo(state.mixedLowerBounds[index]);
+                for (int consumed = 0; consumed < MIXED_ITERATION_SAMPLE && iterator.hasNext(); consumed++) {
+                    blackhole.consume(iterator.next());
+                }
+            }
+
+            if ((index & 15) == 0) {
+                map = map.put(state.mixedWriteKeys[index], state.mixedWriteValues[index]);
+            } else if ((index & 15) == 8) {
+                map = map.remove(state.mixedRemoveKeys[index]);
+            }
+        }
+        return map;
+    }
+
+    @Benchmark
+    public DoubleObjectPersistentSortedMap<String> mixedUpdateHeavy(MapState state, Blackhole blackhole) {
+        DoubleObjectPersistentSortedMap<String> map = state.map;
+        for (int index = 0; index < MIXED_OPERATION_COUNT; index++) {
+            map = map.put(state.mixedWriteKeys[index], state.mixedWriteValues[index]);
+            blackhole.consume(map.find(state.mixedExistingReadKeys[index]));
+
+            if ((index & 1) == 0) {
+                map = map.remove(state.mixedRemoveKeys[index]);
+            }
+
+            if ((index & 3) == 0) {
+                Iterator<String> iterator = map.greaterOrEqualTo(state.mixedLowerBounds[index]);
+                if (iterator.hasNext()) {
+                    blackhole.consume(iterator.next());
+                }
+            }
+        }
+        return map;
+    }
+
     @State(Scope.Thread)
     public static class MapState {
 
-//        @Param({"simple", "treap", "dexx"})
-        @Param("treap")
+        @Param({"simple", "treap", "dexx", "bifurcanSorted", "bifurcanFloat"})
         public String implementation;
 
         @Param({"ascending", "descending"})
@@ -93,6 +139,12 @@ public class DoubleObjectPersistentSortedMapBenchmark {
         public double existingKey;
         public double missingKey;
         public String replacementValue;
+        public double[] mixedExistingReadKeys;
+        public double[] mixedMissingReadKeys;
+        public double[] mixedWriteKeys;
+        public double[] mixedRemoveKeys;
+        public double[] mixedLowerBounds;
+        public String[] mixedWriteValues;
 
         @Setup(Level.Trial)
         public void setUp() {
@@ -104,6 +156,27 @@ public class DoubleObjectPersistentSortedMapBenchmark {
             existingKey = size / 2.0;
             missingKey = size + 1.0;
             replacementValue = "replacement";
+            setUpMixedScenarioInputs();
+        }
+
+        private void setUpMixedScenarioInputs() {
+            mixedExistingReadKeys = new double[MIXED_OPERATION_COUNT];
+            mixedMissingReadKeys = new double[MIXED_OPERATION_COUNT];
+            mixedWriteKeys = new double[MIXED_OPERATION_COUNT];
+            mixedRemoveKeys = new double[MIXED_OPERATION_COUNT];
+            mixedLowerBounds = new double[MIXED_OPERATION_COUNT];
+            mixedWriteValues = new String[MIXED_OPERATION_COUNT];
+
+            for (int index = 0; index < MIXED_OPERATION_COUNT; index++) {
+                mixedExistingReadKeys[index] = (index * 17) % size;
+                mixedMissingReadKeys[index] = size + 32.0 + index;
+                mixedWriteKeys[index] = (index & 1) == 0
+                        ? mixedExistingReadKeys[index]
+                        : size + 1024.0 + index;
+                mixedRemoveKeys[index] = (index * 31) % size;
+                mixedLowerBounds[index] = mixedExistingReadKeys[index] - ((index & 3) == 0 ? 0.25 : 0.0);
+                mixedWriteValues[index] = "mixed-" + index;
+            }
         }
 
         private DoubleObjectPersistentSortedMap<String> createEmptyMap() {
@@ -117,6 +190,12 @@ public class DoubleObjectPersistentSortedMapBenchmark {
                 case "dexx" -> "descending".equals(order)
                         ? DexxDoubleObjectPersistentSortedMap.<String>descending()
                         : DexxDoubleObjectPersistentSortedMap.<String>ascending();
+                case "bifurcanSorted" -> "descending".equals(order)
+                        ? BifurcanSortedMapDoubleObjectPersistentSortedMap.<String>descending()
+                        : BifurcanSortedMapDoubleObjectPersistentSortedMap.<String>ascending();
+                case "bifurcanFloat" -> "descending".equals(order)
+                        ? BifurcanFloatMapDoubleObjectPersistentSortedMap.<String>descending()
+                        : BifurcanFloatMapDoubleObjectPersistentSortedMap.<String>ascending();
                 default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
             };
         }

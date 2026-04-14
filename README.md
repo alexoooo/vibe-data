@@ -23,7 +23,7 @@ On Windows, use:
 | Module | Purpose |
 | --- | --- |
 | `vibe-data` | Published library artifact containing the persistent map API plus simple `TreeMap`-copy and primitive treap implementations |
-| `benchmarks` | JMH benchmarks plus a benchmark-only Dexx `TreeMap` comparison implementation |
+| `benchmarks` | JMH benchmarks plus benchmark-only Dexx and Bifurcan comparison implementations |
 
 ## Current API
 
@@ -76,3 +76,5 @@ java -jar benchmarks/target/benchmarks.jar
 ```
 
 Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()` directly from an IDE to launch that benchmark class without building a custom JMH command line.
+
+The benchmark suite includes both single-operation microbenchmarks and mixed read/write workloads across the library implementations plus benchmark-only comparison wrappers.

@@ -36,7 +36,7 @@ public final class TreapDoubleObjectPersistentSortedMap<T> implements DoubleObje
 
     @Override
     public @Nullable T find(double key) {
-        @Nullable Node<T> current = root;
+        Node<T> current = root;
         while (current != null) {
             int comparison = compare(key, current.key);
             if (comparison == 0) {
@@ -63,7 +63,7 @@ public final class TreapDoubleObjectPersistentSortedMap<T> implements DoubleObje
 
     @Override
     public TreapDoubleObjectPersistentSortedMap<T> remove(double key) {
-        @Nullable Node<T> updatedRoot = remove(root, key);
+        Node<T> updatedRoot = remove(root, key);
         if (updatedRoot == root) {
             return this;
         }
@@ -145,7 +145,7 @@ public final class TreapDoubleObjectPersistentSortedMap<T> implements DoubleObje
 
         int comparison = compare(key, node.key);
         if (comparison < 0) {
-            @Nullable Node<T> updatedLeft = remove(node.left, key);
+            Node<T> updatedLeft = remove(node.left, key);
             if (updatedLeft == node.left) {
                 return node;
             }
@@ -154,7 +154,7 @@ public final class TreapDoubleObjectPersistentSortedMap<T> implements DoubleObje
         }
 
         if (comparison > 0) {
-            @Nullable Node<T> updatedRight = remove(node.right, key);
+            Node<T> updatedRight = remove(node.right, key);
             if (updatedRight == node.right) {
                 return node;
             }
@@ -175,7 +175,7 @@ public final class TreapDoubleObjectPersistentSortedMap<T> implements DoubleObje
         }
 
         if (comparePriority(left.priority, right.priority) > 0) {
-            @Nullable Node<T> mergedRight = merge(left.right, right);
+            Node<T> mergedRight = merge(left.right, right);
             if (mergedRight == left.right) {
                 return left;
             }
@@ -183,7 +183,7 @@ public final class TreapDoubleObjectPersistentSortedMap<T> implements DoubleObje
             return new Node<>(left.key, left.value, left.priority, left.left, mergedRight);
         }
 
-        @Nullable Node<T> mergedLeft = merge(left, right.left);
+        Node<T> mergedLeft = merge(left, right.left);
         if (mergedLeft == right.left) {
             return right;
         }
@@ -318,7 +318,7 @@ public final class TreapDoubleObjectPersistentSortedMap<T> implements DoubleObje
 
     private static final class NodeStack<T> {
 
-        private Object[] elements = new Object[16];
+        private @Nullable Object[] elements = new @Nullable Object[16];
         private int size;
 
         private boolean isEmpty() {
@@ -334,9 +334,10 @@ public final class TreapDoubleObjectPersistentSortedMap<T> implements DoubleObje
         }
 
         private Node<T> pop() {
-            @SuppressWarnings("unchecked")
-            Node<T> node = (Node<T>) elements[--size];
+            Object element = Objects.requireNonNull(elements[--size], "element");
             elements[size] = null;
+            @SuppressWarnings("unchecked")
+            Node<T> node = (Node<T>) element;
             return node;
         }
     }
