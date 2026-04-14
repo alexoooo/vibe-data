@@ -12,7 +12,7 @@
 
     <artifactId>vibe-data-benchmarks</artifactId>
     <name>vibe-data-benchmarks</name>
-    <description>JMH benchmarks for vibe-data persistent sorted maps.</description>
+    <description>JMH benchmarks for vibe-data persistent map implementations.</description>
 
     <dependencies>
         <dependency>
