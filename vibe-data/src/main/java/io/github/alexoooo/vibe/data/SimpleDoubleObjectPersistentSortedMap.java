@@ -44,6 +44,11 @@ public final class SimpleDoubleObjectPersistentSortedMap<T> implements DoubleObj
     }
 
     @Override
+    public int size() {
+        return entries.size();
+    }
+
+    @Override
     public SimpleDoubleObjectPersistentSortedMap<T> remove(double key) {
         TreeMap<Double, T> updatedEntries = new TreeMap<>(entries);
         updatedEntries.remove(key);

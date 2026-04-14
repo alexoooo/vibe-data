@@ -15,6 +15,7 @@ class SimpleDoubleObjectPersistentSortedMapTest {
     void emptyMapReturnsNullAndNoValues() {
         SimpleDoubleObjectPersistentSortedMap<String> map = SimpleDoubleObjectPersistentSortedMap.ascending();
 
+        assertEquals(0, map.size());
         assertNull(map.find(10.0));
         assertEquals(List.of(), toList(map.greaterOrEqualTo(Double.NEGATIVE_INFINITY)));
     }
@@ -26,10 +27,28 @@ class SimpleDoubleObjectPersistentSortedMapTest {
                 .put(1.0, "one")
                 .put(3.0, "three");
 
+        assertEquals(3, map.size());
         assertEquals("one", map.find(1.0));
         assertEquals("two", map.find(2.0));
         assertEquals("three", map.find(3.0));
         assertNull(map.find(4.0));
+    }
+
+    @Test
+    void sizeTracksDistinctKeysAndRemovals() {
+        SimpleDoubleObjectPersistentSortedMap<String> empty = SimpleDoubleObjectPersistentSortedMap.ascending();
+        SimpleDoubleObjectPersistentSortedMap<String> single = empty.put(1.0, "one");
+        SimpleDoubleObjectPersistentSortedMap<String> overwritten = single.put(1.0, "uno");
+        SimpleDoubleObjectPersistentSortedMap<String> pair = overwritten.put(2.0, "two");
+        SimpleDoubleObjectPersistentSortedMap<String> removed = pair.remove(1.0);
+        SimpleDoubleObjectPersistentSortedMap<String> unchanged = removed.remove(42.0);
+
+        assertEquals(0, empty.size());
+        assertEquals(1, single.size());
+        assertEquals(1, overwritten.size());
+        assertEquals(2, pair.size());
+        assertEquals(1, removed.size());
+        assertEquals(1, unchanged.size());
     }
 
     @Test
@@ -64,6 +83,8 @@ class SimpleDoubleObjectPersistentSortedMapTest {
 
         SimpleDoubleObjectPersistentSortedMap<String> removed = original.remove(1.0);
 
+        assertEquals(2, original.size());
+        assertEquals(1, removed.size());
         assertEquals("one", original.find(1.0));
         assertNull(removed.find(1.0));
         assertEquals("two", original.find(2.0));
@@ -75,6 +96,8 @@ class SimpleDoubleObjectPersistentSortedMapTest {
         SimpleDoubleObjectPersistentSortedMap<String> original = SimpleDoubleObjectPersistentSortedMap.ascending();
         SimpleDoubleObjectPersistentSortedMap<String> updated = original.put(1.0, "one");
 
+        assertEquals(0, original.size());
+        assertEquals(1, updated.size());
         assertNull(original.find(1.0));
         assertEquals("one", updated.find(1.0));
     }
