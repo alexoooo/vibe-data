@@ -37,6 +37,7 @@ On Windows, use:
 - `PersistentAppendSequence<T>`
 - `PersistentVector<T>`
 - `SimplePersistentAppendSequence<T>`
+- `ChunkedPersistentAppendSequence<T>`
 - `SimplePersistentVector<T>`
 - `ChunkedPersistentVector<T>`
 
@@ -88,7 +89,29 @@ for (String value : map) {
 
 `put` and `remove` return new map instances, so older versions remain unchanged.
 
-### Append-only sequences and vectors
+### Append-only sequences
+
+```java
+import io.github.alexoooo.vibe.data.ChunkedPersistentAppendSequence;
+
+import java.util.ArrayList;
+import java.util.List;
+
+var sequence = ChunkedPersistentAppendSequence.<String>empty()
+        .append("alpha")
+        .append("beta")
+        .append("gamma");
+
+String first = sequence.first();
+String last = sequence.last();
+int size = sequence.size();
+
+List<String> values = new ArrayList<>();
+sequence.forEach(values::add);
+// values == ["alpha", "beta", "gamma"]
+```
+
+### Append-only vectors
 
 ```java
 import io.github.alexoooo.vibe.data.ChunkedPersistentVector;
@@ -133,7 +156,7 @@ Then run the packaged JMH jar from the target directory, keeping the generated `
 java -jar benchmarks/target/benchmarks.jar
 ```
 
-Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.LongObjectPersistentMapBenchmark.main()`, or `io.github.alexoooo.vibe.data.benchmark.PersistentVectorBenchmark.main()` directly from an IDE to launch those benchmark classes without building a custom JMH command line.
+Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.LongObjectPersistentMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.PersistentAppendSequenceBenchmark.main()`, or `io.github.alexoooo.vibe.data.benchmark.PersistentVectorBenchmark.main()` directly from an IDE to launch those benchmark classes without building a custom JMH command line.
 
 The benchmark suite includes both single-operation microbenchmarks and mixed read/write workloads across the library implementations plus benchmark-only comparison wrappers.
 

@@ -128,7 +128,7 @@ public class PersistentVectorBenchmark {
     @State(Scope.Thread)
     public static class VectorState {
 
-        @Param({"simple", "chunked", "bifurcan"})
+        @Param({"simple", "chunked", "bifurcan", "dexx"})
         public String implementation;
 
         @Param({"128", "4096"})
@@ -159,6 +159,7 @@ public class PersistentVectorBenchmark {
                 case "simple" -> SimplePersistentVector.<String>empty();
                 case "chunked" -> ChunkedPersistentVector.<String>empty();
                 case "bifurcan" -> BifurcanListPersistentVector.<String>empty();
+                case "dexx" -> DexxPersistentVector.<String>empty();
                 default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
             };
         }
