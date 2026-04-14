@@ -2,7 +2,7 @@
 
 `vibe-data` is a Java 25 multi-module Maven project for primitive-specialized persistent data structures.
 
-The main library artifact is `io.github.alexoooo:vibe-data`. This initial slice adds persistent sorted maps with primitive `double` keys and object values in package `io.github.alexoooo.vibe.data`, with JSpecify nullability annotations, JUnit 5 tests, and a separate JMH benchmark module.
+The main library artifact is `io.github.alexoooo:vibe-data`. This initial slice adds persistent sorted maps with primitive `double` keys and object values plus unordered persistent maps with primitive `long` keys and object values in package `io.github.alexoooo.vibe.data`, with JSpecify nullability annotations, JUnit 5 tests, and a separate JMH benchmark module.
 
 ## Build
 
@@ -22,7 +22,7 @@ On Windows, use:
 
 | Module | Purpose |
 | --- | --- |
-| `vibe-data` | Published library artifact containing the persistent map API plus simple `TreeMap`-copy and primitive treap implementations |
+| `vibe-data` | Published library artifact containing the persistent map APIs plus simple `TreeMap`/`HashMap` copy-on-write and primitive treap implementations |
 | `benchmarks` | JMH benchmarks plus benchmark-only Dexx and Bifurcan comparison implementations |
 
 ## Current API
@@ -31,8 +31,13 @@ On Windows, use:
 - `DoubleObjectPersistentSortedMap<T>`
 - `SimpleDoubleObjectPersistentSortedMap<T>`
 - `TreapDoubleObjectPersistentSortedMap<T>`
+- `LongObjectMap<T>`
+- `LongObjectPersistentMap<T>`
+- `SimpleLongObjectPersistentMap<T>`
 
-## Example
+## Examples
+
+### Sorted `double` keys
 
 ```java
 import io.github.alexoooo.vibe.data.SimpleDoubleObjectPersistentSortedMap;
@@ -51,6 +56,29 @@ int size = map.size();
 List<String> values = new ArrayList<>();
 map.greaterOrEqualTo(2.0).forEachRemaining(values::add);
 // values == ["three", "two"]
+```
+
+### Unordered `long` keys
+
+```java
+import io.github.alexoooo.vibe.data.SimpleLongObjectPersistentMap;
+
+import java.util.ArrayList;
+import java.util.List;
+
+var map = SimpleLongObjectPersistentMap.<String>empty()
+        .put(10L, "ten")
+        .put(20L, "twenty")
+        .put(30L, "thirty");
+
+String exact = map.find(20L);
+int size = map.size();
+
+List<String> values = new ArrayList<>();
+for (String value : map) {
+    values.add(value);
+}
+// values contains "ten", "twenty", and "thirty" in unspecified order
 ```
 
 `put` and `remove` return new map instances, so older versions remain unchanged.
