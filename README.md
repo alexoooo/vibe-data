@@ -97,7 +97,7 @@ On Windows:
 .\mvnw.cmd -pl benchmarks -am package
 ```
 
-Then run the shaded JMH jar:
+Then run the packaged JMH jar from the target directory, keeping the generated `lib/` folder beside it:
 
 ```bash
 java -jar benchmarks/target/benchmarks.jar

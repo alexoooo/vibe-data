@@ -24,9 +24,9 @@
         <bifurcan.version>0.2.0-rc1</bifurcan.version>
         <jmh.version>1.37</jmh.version>
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
+        <maven.dependency.plugin.version>3.8.1</maven.dependency.plugin.version>
         <maven.jar.plugin.version>3.4.1</maven.jar.plugin.version>
         <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
-        <maven.shade.plugin.version>3.5.3</maven.shade.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -95,8 +95,8 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>${maven.shade.plugin.version}</version>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven.dependency.plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -9,15 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.github.alexoooo.vibe.data.DoubleObjectPersistentSortedMap;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.NavigableMap;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Random;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 public interface DoubleObjectPersistentSortedMapContract {
@@ -57,8 +51,8 @@ public interface DoubleObjectPersistentSortedMapContract {
         for (IterationOrder order : IterationOrder.values()) {
             DoubleObjectPersistentSortedMap<String> actual = newMap(order);
             ReferenceDoubleObjectPersistentSortedMap expected = ReferenceDoubleObjectPersistentSortedMap.empty(order);
-            List<ContractSnapshot> snapshots = new ArrayList<>();
-            snapshots.add(new ContractSnapshot(actual, expected, "special initial " + order));
+            List<DoubleObjectContractSnapshot> snapshots = new ArrayList<>();
+            snapshots.add(new DoubleObjectContractSnapshot(actual, expected, "special initial " + order));
 
             int step = 0;
             for (double key : probeKeys) {
@@ -66,7 +60,7 @@ public interface DoubleObjectPersistentSortedMapContract {
                 expected = expected.put(key, DoubleObjectPersistentSortedMapContractSupport.valueFor("special", step, key));
 
                 if (step % 3 == 0) {
-                    snapshots.add(new ContractSnapshot(actual, expected, "special step " + step + " " + order));
+                    snapshots.add(new DoubleObjectContractSnapshot(actual, expected, "special step " + step + " " + order));
                 }
 
                 assertMatchesReference(
@@ -99,7 +93,7 @@ public interface DoubleObjectPersistentSortedMapContract {
                         lowerBounds);
             }
 
-            for (ContractSnapshot snapshot : snapshots) {
+            for (DoubleObjectContractSnapshot snapshot : snapshots) {
                 assertMatchesReference(
                         "special snapshot preserved " + snapshot.context(),
                         snapshot.actual(),
@@ -118,11 +112,12 @@ public interface DoubleObjectPersistentSortedMapContract {
         for (IterationOrder order : IterationOrder.values()) {
             DoubleObjectPersistentSortedMap<String> actual = newMap(order);
             ReferenceDoubleObjectPersistentSortedMap expected = ReferenceDoubleObjectPersistentSortedMap.empty(order);
-            List<ContractSnapshot> snapshots = new ArrayList<>();
+            List<DoubleObjectContractSnapshot> snapshots = new ArrayList<>();
 
             for (int key = 0; key < 128; key++) {
                 if (key % 16 == 0) {
-                    snapshots.add(new ContractSnapshot(actual, expected, "sequential insert checkpoint " + key + " " + order));
+                    snapshots.add(
+                            new DoubleObjectContractSnapshot(actual, expected, "sequential insert checkpoint " + key + " " + order));
                 }
 
                 actual = actual.put(key, "sequential-" + key);
@@ -159,7 +154,7 @@ public interface DoubleObjectPersistentSortedMapContract {
                 }
             }
 
-            for (ContractSnapshot snapshot : snapshots) {
+            for (DoubleObjectContractSnapshot snapshot : snapshots) {
                 assertMatchesReference(
                         "sequential snapshot preserved " + snapshot.context(),
                         snapshot.actual(),
@@ -180,12 +175,15 @@ public interface DoubleObjectPersistentSortedMapContract {
                 List<Double> lowerBounds = DoubleObjectPersistentSortedMapContractSupport.lowerBoundsFor(keyPool);
                 DoubleObjectPersistentSortedMap<String> actual = newMap(order);
                 ReferenceDoubleObjectPersistentSortedMap expected = ReferenceDoubleObjectPersistentSortedMap.empty(order);
-                List<ContractSnapshot> snapshots = new ArrayList<>();
-                snapshots.add(new ContractSnapshot(actual, expected, "random initial seed=" + seed + " " + order));
+                List<DoubleObjectContractSnapshot> snapshots = new ArrayList<>();
+                snapshots.add(new DoubleObjectContractSnapshot(actual, expected, "random initial seed=" + seed + " " + order));
 
                 for (int step = 0; step < 256; step++) {
                     if (step % 32 == 0) {
-                        snapshots.add(new ContractSnapshot(actual, expected, "random checkpoint seed=" + seed + " step=" + step + " " + order));
+                        snapshots.add(new DoubleObjectContractSnapshot(
+                                actual,
+                                expected,
+                                "random checkpoint seed=" + seed + " step=" + step + " " + order));
                     }
 
                     double key = keyPool.get(random.nextInt(keyPool.size()));
@@ -223,7 +221,7 @@ public interface DoubleObjectPersistentSortedMapContract {
                             DoubleObjectPersistentSortedMapContractSupport.verificationLowerBounds(lowerBounds, key, step));
                 }
 
-                for (ContractSnapshot snapshot : snapshots) {
+                for (DoubleObjectContractSnapshot snapshot : snapshots) {
                     assertMatchesReference(
                             "random snapshot preserved " + snapshot.context(),
                             snapshot.actual(),
@@ -350,162 +348,5 @@ public interface DoubleObjectPersistentSortedMapContract {
     enum IterationOrder {
         ASCENDING,
         DESCENDING
-    }
-}
-
-record ContractSnapshot(
-        DoubleObjectPersistentSortedMap<String> actual,
-        ReferenceDoubleObjectPersistentSortedMap expected,
-        String context) {
-}
-
-final class DoubleObjectPersistentSortedMapContractSupport {
-
-    private static final List<Double> SPECIAL_KEYS = List.of(
-            Double.NEGATIVE_INFINITY,
-            -100.5,
-            -1.0,
-            -0.0,
-            0.0,
-            Double.MIN_VALUE,
-            1.0,
-            42.5,
-            Double.POSITIVE_INFINITY,
-            Double.NaN);
-
-    private static final List<Double> SPECIAL_LOWER_BOUNDS = List.of(
-            Double.NEGATIVE_INFINITY,
-            -100.5,
-            -1.0,
-            -0.0,
-            0.0,
-            Double.MIN_VALUE,
-            1.0,
-            42.5,
-            Double.POSITIVE_INFINITY,
-            Double.NaN);
-
-    private DoubleObjectPersistentSortedMapContractSupport() {
-    }
-
-    static List<Double> specialKeys() {
-        return SPECIAL_KEYS;
-    }
-
-    static List<Double> specialLowerBounds() {
-        return SPECIAL_LOWER_BOUNDS;
-    }
-
-    static List<Double> sequentialProbeKeys(int size) {
-        List<Double> keys = new ArrayList<>(SPECIAL_KEYS);
-        keys.add(-1.0);
-        for (int key = 0; key <= size; key++) {
-            keys.add((double) key);
-        }
-        return dedupeInOrder(keys);
-    }
-
-    static List<Double> randomKeyPool(long seed, int targetSize) {
-        Random random = new Random(seed);
-        TreeSet<Double> keys = new TreeSet<>();
-        keys.addAll(SPECIAL_KEYS);
-
-        while (keys.size() < targetSize) {
-            keys.add(Double.longBitsToDouble(random.nextLong()));
-        }
-
-        return List.copyOf(keys);
-    }
-
-    static List<Double> lowerBoundsFor(List<Double> keys) {
-        LinkedHashSet<Double> lowerBounds = new LinkedHashSet<>(SPECIAL_LOWER_BOUNDS);
-
-        for (int index = 0; index < keys.size(); index += 5) {
-            lowerBounds.add(keys.get(index));
-        }
-
-        if (!keys.isEmpty()) {
-            lowerBounds.add(keys.get(keys.size() - 1));
-        }
-
-        return List.copyOf(lowerBounds);
-    }
-
-    static List<Double> verificationLowerBounds(List<Double> lowerBounds, double anchorKey, int step) {
-        LinkedHashSet<Double> bounds = new LinkedHashSet<>();
-        bounds.add(Double.NEGATIVE_INFINITY);
-        bounds.add(-0.0);
-        bounds.add(0.0);
-        bounds.add(Double.NaN);
-        bounds.add(anchorKey);
-
-        if (!lowerBounds.isEmpty()) {
-            bounds.add(lowerBounds.get(Math.floorMod(step, lowerBounds.size())));
-            bounds.add(lowerBounds.get(Math.floorMod(step * 17 + 3, lowerBounds.size())));
-            bounds.add(lowerBounds.get(Math.floorMod(step * 31 + 7, lowerBounds.size())));
-        }
-
-        return List.copyOf(bounds);
-    }
-
-    static List<Double> dedupeInOrder(List<Double> values) {
-        return List.copyOf(new LinkedHashSet<>(values));
-    }
-
-    static String describeKey(double key) {
-        return Double.toString(key) + " [0x" + Long.toHexString(Double.doubleToLongBits(key)) + "]";
-    }
-
-    static String valueFor(String scenario, int step, double key) {
-        return scenario + "-" + step + "-" + Long.toHexString(Double.doubleToLongBits(key));
-    }
-
-    static <T> List<T> toList(Iterator<T> iterator) {
-        List<T> values = new ArrayList<>();
-        iterator.forEachRemaining(values::add);
-        return values;
-    }
-}
-
-final class ReferenceDoubleObjectPersistentSortedMap {
-
-    private final NavigableMap<Double, String> entries;
-    private final boolean descending;
-
-    private ReferenceDoubleObjectPersistentSortedMap(NavigableMap<Double, String> entries, boolean descending) {
-        this.entries = entries;
-        this.descending = descending;
-    }
-
-    static ReferenceDoubleObjectPersistentSortedMap empty(DoubleObjectPersistentSortedMapContract.IterationOrder order) {
-        return new ReferenceDoubleObjectPersistentSortedMap(
-                new TreeMap<>(),
-                order == DoubleObjectPersistentSortedMapContract.IterationOrder.DESCENDING);
-    }
-
-    @Nullable String find(double key) {
-        return entries.get(key);
-    }
-
-    List<String> greaterOrEqualTo(double lowerBound) {
-        NavigableMap<Double, String> filteredEntries = entries.tailMap(lowerBound, true);
-        NavigableMap<Double, String> orderedEntries = descending ? filteredEntries.descendingMap() : filteredEntries;
-        return new ArrayList<>(orderedEntries.values());
-    }
-
-    int size() {
-        return entries.size();
-    }
-
-    ReferenceDoubleObjectPersistentSortedMap put(double key, String value) {
-        TreeMap<Double, String> updatedEntries = new TreeMap<>(entries);
-        updatedEntries.put(key, Objects.requireNonNull(value, "value"));
-        return new ReferenceDoubleObjectPersistentSortedMap(updatedEntries, descending);
-    }
-
-    ReferenceDoubleObjectPersistentSortedMap remove(double key) {
-        TreeMap<Double, String> updatedEntries = new TreeMap<>(entries);
-        updatedEntries.remove(key);
-        return new ReferenceDoubleObjectPersistentSortedMap(updatedEntries, descending);
     }
 }
