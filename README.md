@@ -1,8 +1,8 @@
 # vibe-data
 
-`vibe-data` is a Java 25 multi-module Maven project for persistent data structures, including primitive-specialized map types and append-only generic sequence/vector types.
+`vibe-data` is a Java 25 multi-module Maven project for persistent data structures, including primitive-specialized map types, ordered-set-like queues, and append-only generic sequence/vector types.
 
-The main library artifact is `io.github.alexoooo:vibe-data`. The current slice adds persistent sorted maps with primitive `double` keys and object values, unordered persistent maps with primitive `long` keys and object values, and append-only generic sequences/vectors in package `io.github.alexoooo.vibe.data`, with JSpecify nullability annotations, JUnit 5 tests, and a separate JMH benchmark module.
+The main library artifact is `io.github.alexoooo:vibe-data`. It currently provides persistent sorted maps with primitive `double` keys and object values, unordered persistent maps with primitive `long` keys and object values, ordered queues with comparator-aware factories, and append-only generic sequences/vectors in package `io.github.alexoooo.vibe.data`, with JSpecify nullability annotations, JUnit 5 tests, and a separate JMH benchmark module.
 
 ## Build
 
@@ -34,6 +34,11 @@ On Windows, use:
 - `LongObjectMap<T>`
 - `LongObjectPersistentMap<T>`
 - `SimpleLongObjectPersistentMap<T>`
+- `HamtLongObjectPersistentMap<T>`
+- `OrderedQueue<T>`
+- `PersistentOrderedQueue<T>`
+- `SimplePersistentOrderedQueue<T>`
+- `TreapPersistentOrderedQueue<T>`
 - `PersistentAppendSequence<T>`
 - `PersistentVector<T>`
 - `SimplePersistentAppendSequence<T>`
@@ -88,6 +93,32 @@ for (String value : map) {
 ```
 
 `put` and `remove` return new map instances, so older versions remain unchanged.
+
+### Ordered queues
+
+```java
+import io.github.alexoooo.vibe.data.TreapPersistentOrderedQueue;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+var queue = TreapPersistentOrderedQueue.<String>empty(Comparator.comparingInt(String::length))
+        .add("alpha")
+        .add("b")
+        .add("cccc")
+        .replace("alpha", "zz");
+
+String first = queue.first();
+String last = queue.last();
+int size = queue.size();
+
+List<String> values = new ArrayList<>();
+queue.forEach(values::add);
+// values == ["b", "zz", "cccc"]
+```
+
+`add` and `replace` are comparator-aware and use last-write-wins semantics for comparator-equivalent values.
 
 ### Append-only sequences
 
@@ -156,7 +187,7 @@ Then run the packaged JMH jar from the target directory, keeping the generated `
 java -jar benchmarks/target/benchmarks.jar
 ```
 
-Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.LongObjectPersistentMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.PersistentAppendSequenceBenchmark.main()`, or `io.github.alexoooo.vibe.data.benchmark.PersistentVectorBenchmark.main()` directly from an IDE to launch those benchmark classes without building a custom JMH command line.
+Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.LongObjectPersistentMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.PersistentOrderedQueueBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.PersistentAppendSequenceBenchmark.main()`, or `io.github.alexoooo.vibe.data.benchmark.PersistentVectorBenchmark.main()` directly from an IDE to launch those benchmark classes without building a custom JMH command line.
 
 The benchmark suite includes both single-operation microbenchmarks and mixed read/write workloads across the library implementations plus benchmark-only comparison wrappers.
 
