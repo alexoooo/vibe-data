@@ -1,8 +1,6 @@
 package io.github.alexoooo.vibe.data.benchmark;
 
-import io.github.alexoooo.vibe.data.ChunkedPersistentVector;
 import io.github.alexoooo.vibe.data.PersistentVector;
-import io.github.alexoooo.vibe.data.SimplePersistentVector;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.Main;
@@ -143,25 +141,14 @@ public class PersistentVectorBenchmark {
 
         @Setup(Level.Trial)
         public void setUp() {
-            vector = createEmptyVector();
-            for (int index = 0; index < size; index++) {
-                vector = vector.append("value-" + index);
-            }
-
+            vector = BenchmarkFixtures.buildPersistentVector(
+                    implementation,
+                    size,
+                    index -> "value-" + index);
             middleIndex = size / 2;
             nearEndIndex = Math.max(0, size - 5);
             appendValue = "append-value";
             setUpMixedScenarioInputs();
-        }
-
-        private PersistentVector<String> createEmptyVector() {
-            return switch (implementation) {
-                case "simple" -> SimplePersistentVector.<String>empty();
-                case "chunked" -> ChunkedPersistentVector.<String>empty();
-                case "bifurcan" -> BifurcanListPersistentVector.<String>empty();
-                case "dexx" -> DexxPersistentVector.<String>empty();
-                default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
-            };
         }
 
         private void setUpMixedScenarioInputs() {

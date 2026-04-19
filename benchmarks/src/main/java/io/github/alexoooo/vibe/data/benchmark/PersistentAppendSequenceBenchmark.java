@@ -1,9 +1,6 @@
 package io.github.alexoooo.vibe.data.benchmark;
 
-import io.github.alexoooo.vibe.data.ChunkedPersistentAppendSequence;
-import io.github.alexoooo.vibe.data.ChunkedPersistentVector;
 import io.github.alexoooo.vibe.data.PersistentAppendSequence;
-import io.github.alexoooo.vibe.data.SimplePersistentAppendSequence;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.Main;
@@ -121,27 +118,15 @@ public class PersistentAppendSequenceBenchmark {
 
         @Setup(Level.Trial)
         public void setUp() {
-            sequence = createEmptySequence();
-            for (int index = 0; index < size; index++) {
-                sequence = sequence.append("value-" + index);
-            }
-
+            sequence = BenchmarkFixtures.buildPersistentAppendSequence(
+                    implementation,
+                    size,
+                    index -> "value-" + index);
             appendValue = "append-value";
             mixedAppendValues = new String[MIXED_OPERATION_COUNT];
             for (int index = 0; index < MIXED_OPERATION_COUNT; index++) {
                 mixedAppendValues[index] = "mixed-append-" + index;
             }
-        }
-
-        private PersistentAppendSequence<String> createEmptySequence() {
-            return switch (implementation) {
-                case "simple" -> SimplePersistentAppendSequence.<String>empty();
-                case "chunkedVector" -> ChunkedPersistentVector.<String>empty();
-                case "chunkedAppend" -> ChunkedPersistentAppendSequence.<String>empty();
-                case "bifurcan" -> BifurcanListPersistentAppendSequence.<String>empty();
-                case "dexx" -> DexxPersistentAppendSequence.<String>empty();
-                default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
-            };
         }
     }
 }

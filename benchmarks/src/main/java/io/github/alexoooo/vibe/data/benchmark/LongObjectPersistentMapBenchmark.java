@@ -1,8 +1,6 @@
 package io.github.alexoooo.vibe.data.benchmark;
 
-import io.github.alexoooo.vibe.data.HamtLongObjectPersistentMap;
 import io.github.alexoooo.vibe.data.LongObjectPersistentMap;
-import io.github.alexoooo.vibe.data.SimpleLongObjectPersistentMap;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.Nullable;
@@ -131,11 +129,10 @@ public class LongObjectPersistentMapBenchmark {
 
         @Setup(Level.Trial)
         public void setUp() {
-            map = createEmptyMap();
-            for (int index = 0; index < size; index++) {
-                map = map.put(index, "value-" + index);
-            }
-
+            map = BenchmarkFixtures.buildLongObjectPersistentMap(
+                    implementation,
+                    size,
+                    index -> "value-" + index);
             existingKey = size / 2L;
             missingKey = size + 1L;
             replacementValue = "replacement";
@@ -160,15 +157,5 @@ public class LongObjectPersistentMapBenchmark {
             }
         }
 
-        private LongObjectPersistentMap<String> createEmptyMap() {
-            return switch (implementation) {
-                case "simple" -> SimpleLongObjectPersistentMap.<String>empty();
-                case "hamt" -> HamtLongObjectPersistentMap.<String>empty();
-                case "dexx" -> DexxLongObjectPersistentMap.<String>empty();
-                case "bifurcan" -> BifurcanIntMapLongObjectPersistentMap.<String>empty();
-                case "bifurcanMap" -> BifurcanMapLongObjectPersistentMap.<String>empty();
-                default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
-            };
-        }
     }
 }

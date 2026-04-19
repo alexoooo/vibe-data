@@ -192,3 +192,15 @@ Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBe
 The benchmark suite includes both single-operation microbenchmarks and mixed read/write workloads across the library implementations plus benchmark-only comparison wrappers.
 
 Saved benchmark result snapshots live under `benchmarks/src/main/resources/results/` with timestamped filenames.
+
+### Memory usage report
+
+Generate the retained-heap comparison report:
+
+```powershell
+.\mvnw.cmd -f benchmarks\pom.xml -am -DskipTests -Dexec.mainClass=io.github.alexoooo.vibe.data.benchmark.MemoryUsageReport org.codehaus.mojo:exec-maven-plugin:3.5.0:java
+```
+
+Or run `io.github.alexoooo.vibe.data.benchmark.MemoryUsageReport.main()` directly from an IDE.
+
+The command writes a timestamped CSV snapshot and refreshes the checked-in Markdown summary at `benchmarks/src/main/resources/results/memory-usage-summary.md`. The report captures retained bytes, a structural-bytes view with the shared payload cost removed, and the JVM layout details used for the run.

@@ -148,11 +148,11 @@ public class DoubleObjectPersistentSortedMapBenchmark {
 
         @Setup(Level.Trial)
         public void setUp() {
-            map = createEmptyMap();
-            for (int index = 0; index < size; index++) {
-                map = map.put(index, "value-" + index);
-            }
-
+            map = BenchmarkFixtures.buildDoubleObjectPersistentSortedMap(
+                    implementation,
+                    order,
+                    size,
+                    index -> "value-" + index);
             existingKey = size / 2.0;
             missingKey = size + 1.0;
             replacementValue = "replacement";
@@ -179,25 +179,5 @@ public class DoubleObjectPersistentSortedMapBenchmark {
             }
         }
 
-        private DoubleObjectPersistentSortedMap<String> createEmptyMap() {
-            return switch (implementation) {
-                case "simple" -> "descending".equals(order)
-                        ? SimpleDoubleObjectPersistentSortedMap.<String>descending()
-                        : SimpleDoubleObjectPersistentSortedMap.<String>ascending();
-                case "treap" -> "descending".equals(order)
-                        ? TreapDoubleObjectPersistentSortedMap.<String>descending()
-                        : TreapDoubleObjectPersistentSortedMap.<String>ascending();
-                case "dexx" -> "descending".equals(order)
-                        ? DexxDoubleObjectPersistentSortedMap.<String>descending()
-                        : DexxDoubleObjectPersistentSortedMap.<String>ascending();
-                case "bifurcanSorted" -> "descending".equals(order)
-                        ? BifurcanSortedMapDoubleObjectPersistentSortedMap.<String>descending()
-                        : BifurcanSortedMapDoubleObjectPersistentSortedMap.<String>ascending();
-                case "bifurcanFloat" -> "descending".equals(order)
-                        ? BifurcanFloatMapDoubleObjectPersistentSortedMap.<String>descending()
-                        : BifurcanFloatMapDoubleObjectPersistentSortedMap.<String>ascending();
-                default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
-            };
-        }
     }
 }

@@ -1,8 +1,6 @@
 package io.github.alexoooo.vibe.data.benchmark;
 
 import io.github.alexoooo.vibe.data.PersistentOrderedQueue;
-import io.github.alexoooo.vibe.data.SimplePersistentOrderedQueue;
-import io.github.alexoooo.vibe.data.TreapPersistentOrderedQueue;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.Main;
@@ -138,11 +136,10 @@ public class PersistentOrderedQueueBenchmark {
 
         @Setup(Level.Trial)
         public void setUp() {
-            queue = createEmptyQueue();
-            for (int index = 0; index < size; index++) {
-                queue = queue.add(index);
-            }
-
+            queue = BenchmarkFixtures.buildPersistentOrderedQueue(
+                    implementation,
+                    size,
+                    Integer::valueOf);
             existingValue = size / 2;
             missingValue = size + 1;
             replacementValue = size + 10_000;
@@ -154,14 +151,5 @@ public class PersistentOrderedQueueBenchmark {
             }
         }
 
-        private PersistentOrderedQueue<Integer> createEmptyQueue() {
-            return switch (implementation) {
-                case "simple" -> SimplePersistentOrderedQueue.<Integer>empty();
-                case "treap" -> TreapPersistentOrderedQueue.<Integer>empty();
-                case "dexx" -> DexxPersistentOrderedQueue.<Integer>empty();
-                case "bifurcan" -> BifurcanPersistentOrderedQueue.<Integer>empty();
-                default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
-            };
-        }
     }
 }
