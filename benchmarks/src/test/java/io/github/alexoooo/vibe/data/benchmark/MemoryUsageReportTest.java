@@ -13,9 +13,9 @@ class MemoryUsageReportTest {
 
     @Test
     void measuresRealRowsForAllConfiguredImplementations() {
-        List<MemoryUsageReport.MeasurementRow> rows = MemoryUsageReport.measureAll();
+        List<MemoryUsageReport.MeasurementRow> rows = MemoryUsageReport.measureAll(new int[] {0, 128});
 
-        assertEquals(84, rows.size());
+        assertEquals(64, rows.size());
         assertFalse(rows.isEmpty());
         assertEquals(
                 Set.of(

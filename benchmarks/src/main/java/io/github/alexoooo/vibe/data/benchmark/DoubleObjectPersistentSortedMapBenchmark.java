@@ -126,7 +126,7 @@ public class DoubleObjectPersistentSortedMapBenchmark {
     @State(Scope.Thread)
     public static class MapState {
 
-        @Param({"simple", "treap", "dexx", "bifurcanSorted", "bifurcanFloat"})
+        @Param({"simple", "treap", "compact", "dexx", "bifurcanSorted", "bifurcanFloat"})
         public String implementation;
 
         @Param({"ascending", "descending"})

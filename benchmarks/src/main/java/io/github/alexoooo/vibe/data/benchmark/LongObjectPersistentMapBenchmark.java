@@ -111,7 +111,7 @@ public class LongObjectPersistentMapBenchmark {
     @State(Scope.Thread)
     public static class MapState {
 
-        @Param({"simple", "hamt", "dexx", "bifurcan", "bifurcanMap"})
+        @Param({"simple", "hamt", "compact", "dexx", "bifurcan", "bifurcanMap"})
         public String implementation;
 
         @Param({"128", "4096"})

@@ -2,6 +2,9 @@ package io.github.alexoooo.vibe.data.benchmark;
 
 import io.github.alexoooo.vibe.data.ChunkedPersistentAppendSequence;
 import io.github.alexoooo.vibe.data.ChunkedPersistentVector;
+import io.github.alexoooo.vibe.data.CompactDoubleObjectPersistentSortedMap;
+import io.github.alexoooo.vibe.data.CompactLongObjectPersistentMap;
+import io.github.alexoooo.vibe.data.CompactPersistentOrderedQueue;
 import io.github.alexoooo.vibe.data.DoubleObjectPersistentSortedMap;
 import io.github.alexoooo.vibe.data.HamtLongObjectPersistentMap;
 import io.github.alexoooo.vibe.data.LongObjectPersistentMap;
@@ -78,7 +81,7 @@ final class BenchmarkFixtures {
         return vector;
     }
 
-    private static <T> DoubleObjectPersistentSortedMap<T> createDoubleObjectPersistentSortedMap(
+    static <T> DoubleObjectPersistentSortedMap<T> createDoubleObjectPersistentSortedMap(
             String implementation,
             String order) {
         return switch (implementation) {
@@ -91,6 +94,9 @@ final class BenchmarkFixtures {
             case "dexx" -> "descending".equals(order)
                     ? DexxDoubleObjectPersistentSortedMap.<T>descending()
                     : DexxDoubleObjectPersistentSortedMap.<T>ascending();
+            case "compact" -> "descending".equals(order)
+                    ? CompactDoubleObjectPersistentSortedMap.<T>descending()
+                    : CompactDoubleObjectPersistentSortedMap.<T>ascending();
             case "bifurcanSorted" -> "descending".equals(order)
                     ? BifurcanSortedMapDoubleObjectPersistentSortedMap.<T>descending()
                     : BifurcanSortedMapDoubleObjectPersistentSortedMap.<T>ascending();
@@ -101,10 +107,11 @@ final class BenchmarkFixtures {
         };
     }
 
-    private static <T> LongObjectPersistentMap<T> createLongObjectPersistentMap(String implementation) {
+    static <T> LongObjectPersistentMap<T> createLongObjectPersistentMap(String implementation) {
         return switch (implementation) {
             case "simple" -> SimpleLongObjectPersistentMap.<T>empty();
             case "hamt" -> HamtLongObjectPersistentMap.<T>empty();
+            case "compact" -> CompactLongObjectPersistentMap.<T>empty();
             case "dexx" -> DexxLongObjectPersistentMap.<T>empty();
             case "bifurcan" -> BifurcanIntMapLongObjectPersistentMap.<T>empty();
             case "bifurcanMap" -> BifurcanMapLongObjectPersistentMap.<T>empty();
@@ -112,18 +119,19 @@ final class BenchmarkFixtures {
         };
     }
 
-    private static <T extends Comparable<? super T>> PersistentOrderedQueue<T> createPersistentOrderedQueue(
+    static <T extends Comparable<? super T>> PersistentOrderedQueue<T> createPersistentOrderedQueue(
             String implementation) {
         return switch (implementation) {
             case "simple" -> SimplePersistentOrderedQueue.<T>empty();
             case "treap" -> TreapPersistentOrderedQueue.<T>empty();
+            case "compact" -> CompactPersistentOrderedQueue.<T>empty();
             case "dexx" -> DexxPersistentOrderedQueue.<T>empty();
             case "bifurcan" -> BifurcanPersistentOrderedQueue.<T>empty();
             default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
         };
     }
 
-    private static <T> PersistentAppendSequence<T> createPersistentAppendSequence(String implementation) {
+    static <T> PersistentAppendSequence<T> createPersistentAppendSequence(String implementation) {
         return switch (implementation) {
             case "simple" -> SimplePersistentAppendSequence.<T>empty();
             case "chunkedVector" -> ChunkedPersistentVector.<T>empty();
@@ -134,7 +142,7 @@ final class BenchmarkFixtures {
         };
     }
 
-    private static <T> PersistentVector<T> createPersistentVector(String implementation) {
+    static <T> PersistentVector<T> createPersistentVector(String implementation) {
         return switch (implementation) {
             case "simple" -> SimplePersistentVector.<T>empty();
             case "chunked" -> ChunkedPersistentVector.<T>empty();

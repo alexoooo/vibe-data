@@ -1,28 +1,26 @@
 # Memory usage summary
 
-- Generated: `2026-04-19T18:42:08.476092Z`
-- Source CSV: [`2026-04-19T18-42-08Z-memory-usage.csv`](./2026-04-19T18-42-08Z-memory-usage.csv)
+- Generated: `2026-04-19T23:13:40.0295145Z`
+- Source CSV: [`2026-04-19T23-13-40Z-memory-usage.csv`](./2026-04-19T23-13-40Z-memory-usage.csv)
 - Java: `25.0.1` (`OpenJDK 64-Bit Server VM`, `Eclipse Adoptium`)
 - OS: `Windows 11 10.0`
 - Measured sizes: `0`, `128`, `4096`
+- Retention model: all versions from the build sequence are retained (`empty`, then every mutation through the final size)
 - Payload model: one small comparable payload object per logical element; `structural bytes` subtract that payload cost from the retained graph to isolate collection overhead more directly.
 - Payload bytes per element: `16`
 
 ## Methodology
 
-- Retained footprint is measured from the fully built collection instance with JOL `GraphLayout`.
+- Retained footprint is measured from a retained-history container holding the empty version and every subsequent mutation snapshot with JOL `GraphLayout`.
 - Sorted maps are measured in both `ascending` and `descending` order configurations.
-- `Retained bytes` is the full reachable graph size; `structural bytes` subtracts the per-element payload objects while keeping collection nodes, arrays, and references.
+- `Retained bytes` is the full reachable graph size of the retained history; `structural bytes` subtract the unique per-element payload objects while keeping collection nodes, arrays, roots, and references.
 
 ## JVM layout details
 
 ```text
 # VM mode: 64 bits
 # Compressed references (oops): 3-bit shift
-# Compressed class pointers: 3-bit shift
-# WARNING | Compressed references base/shifts are guessed by the experiment!
-# WARNING | Therefore, computed addresses are just guesses, and ARE NOT RELIABLE.
-# WARNING | Make sure to attach Serviceability Agent to get the reliable addresses.
+# Compressed class pointers: 0-bit shift and 0x27000000 base
 # Object alignment: 8 bytes
 #                       ref, bool, byte, char, shrt,  int,  flt,  lng,  dbl
 # Field sizes:            4,    1,    1,    2,    2,    4,    4,    8,    8
@@ -38,31 +36,34 @@
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | treap | 24 | 24 | - | - | 1 |
-| 2 | simple | 72 | 72 | - | - | 2 |
-| 3 | dexx | 104 | 104 | - | - | 5 |
-| 4 | bifurcanSorted | 240 | 240 | - | - | 9 |
-| 5 | bifurcanFloat | 344 | 344 | - | - | 11 |
+| 1 | compact | 64 | 64 | - | - | 3 |
+| 2 | treap | 64 | 64 | - | - | 3 |
+| 3 | simple | 112 | 112 | - | - | 4 |
+| 4 | dexx | 144 | 144 | - | - | 7 |
+| 5 | bifurcanSorted | 280 | 280 | - | - | 11 |
+| 6 | bifurcanFloat | 384 | 384 | - | - | 13 |
 
 #### size = 128
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | treap | 8216 | 6168 | 64.188 | 48.188 | 257 |
-| 2 | bifurcanFloat | 8400 | 6352 | 65.625 | 49.625 | 291 |
-| 3 | dexx | 9320 | 7272 | 72.813 | 56.813 | 389 |
-| 4 | simple | 10312 | 8264 | 80.563 | 64.563 | 386 |
-| 5 | bifurcanSorted | 10552 | 8504 | 82.438 | 66.438 | 396 |
+| 1 | compact | 36656 | 34608 | 286.375 | 270.375 | 904 |
+| 2 | treap | 36656 | 34608 | 286.375 | 270.375 | 904 |
+| 3 | dexx | 47056 | 45008 | 367.625 | 351.625 | 1617 |
+| 4 | bifurcanSorted | 57072 | 55024 | 445.875 | 429.875 | 1624 |
+| 5 | bifurcanFloat | 88424 | 86376 | 690.813 | 674.813 | 1958 |
+| 6 | simple | 347248 | 345200 | 2712.875 | 2696.875 | 8900 |
 
 #### size = 4096
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | bifurcanFloat | 217688 | 152152 | 53.146 | 37.146 | 7621 |
-| 2 | treap | 262168 | 196632 | 64.006 | 48.006 | 8193 |
-| 3 | dexx | 295016 | 229480 | 72.025 | 56.025 | 12293 |
-| 4 | simple | 327752 | 262216 | 80.018 | 64.018 | 12290 |
-| 5 | bifurcanSorted | 327992 | 262456 | 80.076 | 64.076 | 12300 |
+| 1 | compact | 1947168 | 1881632 | 475.383 | 459.383 | 45005 |
+| 2 | treap | 1947168 | 1881632 | 475.383 | 459.383 | 45005 |
+| 3 | dexx | 2474608 | 2409072 | 604.152 | 588.152 | 81942 |
+| 4 | bifurcanSorted | 3031992 | 2966456 | 740.232 | 724.232 | 81949 |
+| 5 | bifurcanFloat | 4273792 | 4208256 | 1043.406 | 1027.406 | 76509 |
+| 6 | simple | 336167024 | 336101488 | 82072.027 | 82056.027 | 8411140 |
 
 ### descending
 
@@ -70,31 +71,34 @@
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | treap | 24 | 24 | - | - | 1 |
-| 2 | simple | 72 | 72 | - | - | 2 |
-| 3 | dexx | 104 | 104 | - | - | 5 |
-| 4 | bifurcanSorted | 240 | 240 | - | - | 9 |
-| 5 | bifurcanFloat | 344 | 344 | - | - | 11 |
+| 1 | compact | 64 | 64 | - | - | 3 |
+| 2 | treap | 64 | 64 | - | - | 3 |
+| 3 | simple | 112 | 112 | - | - | 4 |
+| 4 | dexx | 144 | 144 | - | - | 7 |
+| 5 | bifurcanSorted | 280 | 280 | - | - | 11 |
+| 6 | bifurcanFloat | 384 | 384 | - | - | 13 |
 
 #### size = 128
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | treap | 8216 | 6168 | 64.188 | 48.188 | 257 |
-| 2 | bifurcanFloat | 8400 | 6352 | 65.625 | 49.625 | 291 |
-| 3 | dexx | 9320 | 7272 | 72.813 | 56.813 | 389 |
-| 4 | simple | 10312 | 8264 | 80.563 | 64.563 | 386 |
-| 5 | bifurcanSorted | 10552 | 8504 | 82.438 | 66.438 | 396 |
+| 1 | compact | 36656 | 34608 | 286.375 | 270.375 | 904 |
+| 2 | treap | 36656 | 34608 | 286.375 | 270.375 | 904 |
+| 3 | dexx | 47056 | 45008 | 367.625 | 351.625 | 1617 |
+| 4 | bifurcanSorted | 57072 | 55024 | 445.875 | 429.875 | 1624 |
+| 5 | bifurcanFloat | 88424 | 86376 | 690.813 | 674.813 | 1958 |
+| 6 | simple | 347248 | 345200 | 2712.875 | 2696.875 | 8900 |
 
 #### size = 4096
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | bifurcanFloat | 217688 | 152152 | 53.146 | 37.146 | 7621 |
-| 2 | treap | 262168 | 196632 | 64.006 | 48.006 | 8193 |
-| 3 | dexx | 295016 | 229480 | 72.025 | 56.025 | 12293 |
-| 4 | simple | 327752 | 262216 | 80.018 | 64.018 | 12290 |
-| 5 | bifurcanSorted | 327992 | 262456 | 80.076 | 64.076 | 12300 |
+| 1 | compact | 1947168 | 1881632 | 475.383 | 459.383 | 45005 |
+| 2 | treap | 1947168 | 1881632 | 475.383 | 459.383 | 45005 |
+| 3 | dexx | 2474608 | 2409072 | 604.152 | 588.152 | 81942 |
+| 4 | bifurcanSorted | 3031992 | 2966456 | 740.232 | 724.232 | 81949 |
+| 5 | bifurcanFloat | 4273792 | 4208256 | 1043.406 | 1027.406 | 76509 |
+| 6 | simple | 336167024 | 336101488 | 82072.027 | 82056.027 | 8411140 |
 
 ## LongObjectPersistentMap
 
@@ -102,31 +106,34 @@
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | hamt | 24 | 24 | - | - | 1 |
-| 2 | dexx | 48 | 48 | - | - | 3 |
-| 3 | simple | 64 | 64 | - | - | 2 |
-| 4 | bifurcanMap | 192 | 192 | - | - | 8 |
-| 5 | bifurcan | 304 | 304 | - | - | 10 |
+| 1 | compact | 64 | 64 | - | - | 3 |
+| 2 | hamt | 64 | 64 | - | - | 3 |
+| 3 | dexx | 88 | 88 | - | - | 5 |
+| 4 | simple | 104 | 104 | - | - | 4 |
+| 5 | bifurcanMap | 232 | 232 | - | - | 10 |
+| 6 | bifurcan | 344 | 344 | - | - | 12 |
 
 #### size = 128
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | bifurcan | 4776 | 2728 | 37.313 | 21.313 | 169 |
-| 2 | hamt | 8360 | 6312 | 65.313 | 49.313 | 331 |
-| 3 | bifurcanMap | 10008 | 7960 | 78.188 | 62.188 | 391 |
-| 4 | simple | 10320 | 8272 | 80.625 | 64.625 | 387 |
-| 5 | dexx | 10536 | 8488 | 82.313 | 66.313 | 466 |
+| 1 | dexx | 36752 | 34704 | 287.125 | 271.125 | 1106 |
+| 2 | hamt | 36840 | 34792 | 287.813 | 271.813 | 789 |
+| 3 | compact | 39104 | 37056 | 305.500 | 289.500 | 922 |
+| 4 | bifurcan | 56288 | 54240 | 439.750 | 423.750 | 1226 |
+| 5 | bifurcanMap | 79096 | 77048 | 617.938 | 601.938 | 1322 |
+| 6 | simple | 347800 | 345752 | 2717.188 | 2701.188 | 9027 |
 
 #### size = 4096
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | bifurcan | 146264 | 80728 | 35.709 | 19.709 | 5178 |
-| 2 | hamt | 265816 | 200280 | 64.896 | 48.896 | 10543 |
-| 3 | bifurcanMap | 318232 | 252696 | 77.693 | 61.693 | 12391 |
-| 4 | simple | 327760 | 262224 | 80.020 | 64.020 | 12291 |
-| 5 | dexx | 334280 | 268744 | 81.611 | 65.611 | 14740 |
+| 1 | dexx | 1852952 | 1787416 | 452.381 | 436.381 | 43482 |
+| 2 | compact | 1947064 | 1881528 | 475.357 | 459.357 | 37580 |
+| 3 | hamt | 2153320 | 2087784 | 525.713 | 509.713 | 31555 |
+| 4 | bifurcan | 2929760 | 2864224 | 715.273 | 699.273 | 51010 |
+| 5 | bifurcanMap | 4384504 | 4318968 | 1070.436 | 1054.436 | 54186 |
+| 6 | simple | 336183448 | 336117912 | 82076.037 | 82060.037 | 8415235 |
 
 ## PersistentAppendSequence
 
@@ -134,31 +141,31 @@
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | chunkedVector | 48 | 48 | - | - | 2 |
-| 2 | chunkedAppend | 56 | 56 | - | - | 2 |
-| 3 | simple | 72 | 72 | - | - | 4 |
-| 4 | dexx | 88 | 88 | - | - | 3 |
-| 5 | bifurcan | 160 | 160 | - | - | 6 |
+| 1 | chunkedVector | 88 | 88 | - | - | 4 |
+| 2 | chunkedAppend | 96 | 96 | - | - | 4 |
+| 3 | simple | 112 | 112 | - | - | 6 |
+| 4 | dexx | 128 | 128 | - | - | 5 |
+| 5 | bifurcan | 200 | 200 | - | - | 8 |
 
 #### size = 128
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | simple | 2632 | 584 | 20.563 | 4.563 | 132 |
-| 2 | chunkedVector | 2688 | 640 | 21.000 | 5.000 | 134 |
-| 3 | chunkedAppend | 2696 | 648 | 21.063 | 5.063 | 134 |
-| 4 | bifurcan | 2808 | 760 | 21.938 | 5.938 | 138 |
-| 5 | dexx | 2856 | 808 | 22.313 | 6.313 | 136 |
+| 1 | chunkedVector | 17576 | 15528 | 137.313 | 121.313 | 391 |
+| 2 | chunkedAppend | 18608 | 16560 | 145.375 | 129.375 | 391 |
+| 3 | bifurcan | 23384 | 21336 | 182.688 | 166.688 | 536 |
+| 4 | dexx | 32816 | 30768 | 256.375 | 240.375 | 648 |
+| 5 | simple | 45136 | 43088 | 352.625 | 336.625 | 645 |
 
 #### size = 4096
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | simple | 81992 | 16456 | 20.018 | 4.018 | 4100 |
-| 2 | chunkedVector | 84608 | 19072 | 20.656 | 4.656 | 4230 |
-| 3 | chunkedAppend | 84616 | 19080 | 20.658 | 4.658 | 4230 |
-| 4 | dexx | 84776 | 19240 | 20.697 | 4.697 | 4232 |
-| 5 | bifurcan | 85992 | 20456 | 20.994 | 4.994 | 4245 |
+| 1 | chunkedVector | 570536 | 505000 | 139.291 | 123.291 | 12514 |
+| 2 | chunkedAppend | 603312 | 537776 | 147.293 | 131.293 | 12514 |
+| 3 | bifurcan | 780296 | 714760 | 190.502 | 174.502 | 17192 |
+| 4 | dexx | 1064864 | 999328 | 259.977 | 243.977 | 20711 |
+| 5 | simple | 33947728 | 33882192 | 8288.020 | 8272.020 | 20485 |
 
 ## PersistentOrderedQueue
 
@@ -166,28 +173,31 @@
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | simple | 80 | 80 | - | - | 3 |
-| 2 | treap | 104 | 104 | - | - | 4 |
-| 3 | dexx | 112 | 112 | - | - | 6 |
-| 4 | bifurcan | 256 | 256 | - | - | 10 |
+| 1 | simple | 120 | 120 | - | - | 5 |
+| 2 | compact | 144 | 144 | - | - | 6 |
+| 3 | treap | 144 | 144 | - | - | 6 |
+| 4 | dexx | 152 | 152 | - | - | 8 |
+| 5 | bifurcan | 296 | 296 | - | - | 12 |
 
 #### size = 128
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | dexx | 5232 | 3184 | 40.875 | 24.875 | 262 |
-| 2 | simple | 7264 | 5216 | 56.750 | 40.750 | 260 |
-| 3 | treap | 7272 | 5224 | 56.813 | 40.813 | 260 |
-| 4 | bifurcan | 7496 | 5448 | 58.563 | 42.563 | 269 |
+| 1 | compact | 30960 | 28912 | 241.875 | 225.875 | 866 |
+| 2 | treap | 30960 | 28912 | 241.875 | 225.875 | 866 |
+| 3 | dexx | 34184 | 32136 | 267.063 | 251.063 | 1490 |
+| 4 | bifurcan | 56064 | 54016 | 438.000 | 422.000 | 1625 |
+| 5 | simple | 345224 | 343176 | 2697.063 | 2681.063 | 8902 |
 
 #### size = 4096
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | dexx | 163952 | 98416 | 40.027 | 24.027 | 8198 |
-| 2 | simple | 229472 | 163936 | 56.023 | 40.023 | 8196 |
-| 3 | treap | 229480 | 163944 | 56.025 | 40.025 | 8196 |
-| 4 | bifurcan | 229704 | 164168 | 56.080 | 40.080 | 8205 |
+| 1 | compact | 1742856 | 1677320 | 425.502 | 409.502 | 46441 |
+| 2 | treap | 1742856 | 1677320 | 425.502 | 409.502 | 46441 |
+| 3 | dexx | 1819136 | 1753600 | 444.125 | 428.125 | 77847 |
+| 4 | bifurcan | 2999240 | 2933704 | 732.236 | 716.236 | 81950 |
+| 5 | simple | 336101512 | 336035976 | 82056.033 | 82040.033 | 8411142 |
 
 ## PersistentVector
 
@@ -195,25 +205,25 @@
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | chunked | 48 | 48 | - | - | 2 |
-| 2 | simple | 56 | 56 | - | - | 3 |
-| 3 | dexx | 88 | 88 | - | - | 3 |
-| 4 | bifurcan | 160 | 160 | - | - | 6 |
+| 1 | chunked | 88 | 88 | - | - | 4 |
+| 2 | simple | 96 | 96 | - | - | 5 |
+| 3 | dexx | 128 | 128 | - | - | 5 |
+| 4 | bifurcan | 200 | 200 | - | - | 8 |
 
 #### size = 128
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | simple | 2616 | 568 | 20.438 | 4.438 | 131 |
-| 2 | chunked | 2688 | 640 | 21.000 | 5.000 | 134 |
-| 3 | bifurcan | 2808 | 760 | 21.938 | 5.938 | 138 |
-| 4 | dexx | 2856 | 808 | 22.313 | 6.313 | 136 |
+| 1 | chunked | 17576 | 15528 | 137.313 | 121.313 | 391 |
+| 2 | bifurcan | 23384 | 21336 | 182.688 | 166.688 | 536 |
+| 3 | dexx | 32816 | 30768 | 256.375 | 240.375 | 648 |
+| 4 | simple | 43072 | 41024 | 336.500 | 320.500 | 516 |
 
 #### size = 4096
 
 | Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | simple | 81976 | 16440 | 20.014 | 4.014 | 4099 |
-| 2 | chunked | 84608 | 19072 | 20.656 | 4.656 | 4230 |
-| 3 | dexx | 84776 | 19240 | 20.697 | 4.697 | 4232 |
-| 4 | bifurcan | 85992 | 20456 | 20.994 | 4.994 | 4245 |
+| 1 | chunked | 570536 | 505000 | 139.291 | 123.291 | 12514 |
+| 2 | bifurcan | 780296 | 714760 | 190.502 | 174.502 | 17192 |
+| 3 | dexx | 1064864 | 999328 | 259.977 | 243.977 | 20711 |
+| 4 | simple | 33882176 | 33816640 | 8272.016 | 8256.016 | 16388 |

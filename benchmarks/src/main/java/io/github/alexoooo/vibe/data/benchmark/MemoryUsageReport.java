@@ -1,5 +1,10 @@
 package io.github.alexoooo.vibe.data.benchmark;
 
+import io.github.alexoooo.vibe.data.DoubleObjectPersistentSortedMap;
+import io.github.alexoooo.vibe.data.LongObjectPersistentMap;
+import io.github.alexoooo.vibe.data.PersistentAppendSequence;
+import io.github.alexoooo.vibe.data.PersistentOrderedQueue;
+import io.github.alexoooo.vibe.data.PersistentVector;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,10 +23,10 @@ public final class MemoryUsageReport {
     private static final String[] APPEND_SEQUENCE_IMPLEMENTATIONS =
             {"simple", "chunkedVector", "chunkedAppend", "bifurcan", "dexx"};
     private static final String[] LONG_MAP_IMPLEMENTATIONS =
-            {"simple", "hamt", "dexx", "bifurcan", "bifurcanMap"};
-    private static final String[] ORDERED_QUEUE_IMPLEMENTATIONS = {"simple", "treap", "dexx", "bifurcan"};
+            {"simple", "hamt", "compact", "dexx", "bifurcan", "bifurcanMap"};
+    private static final String[] ORDERED_QUEUE_IMPLEMENTATIONS = {"simple", "treap", "compact", "dexx", "bifurcan"};
     private static final String[] SORTED_MAP_IMPLEMENTATIONS =
-            {"simple", "treap", "dexx", "bifurcanSorted", "bifurcanFloat"};
+            {"simple", "treap", "compact", "dexx", "bifurcanSorted", "bifurcanFloat"};
     private static final String[] SORT_ORDERS = {"ascending", "descending"};
     private static final String[] VECTOR_IMPLEMENTATIONS = {"simple", "chunked", "bifurcan", "dexx"};
     private static final int[] SIZES = {0, 128, 4096};
@@ -42,7 +47,7 @@ public final class MemoryUsageReport {
                 VM.current().details(),
                 PAYLOAD_BYTES_PER_ELEMENT);
 
-        List<MeasurementRow> rows = measureAll();
+        List<MeasurementRow> rows = measureAll(SIZES);
         Path resultsDirectory = resolveResultsDirectory();
         Files.createDirectories(resultsDirectory);
 
@@ -86,94 +91,82 @@ public final class MemoryUsageReport {
     }
 
     static List<MeasurementRow> measureAll() {
+        return measureAll(SIZES);
+    }
+
+    static List<MeasurementRow> measureAll(int[] sizes) {
         List<MeasurementRow> rows = new ArrayList<>();
-        measureSortedMaps(rows);
-        measureLongMaps(rows);
-        measureOrderedQueues(rows);
-        measureAppendSequences(rows);
-        measureVectors(rows);
+        measureSortedMaps(rows, sizes);
+        measureLongMaps(rows, sizes);
+        measureOrderedQueues(rows, sizes);
+        measureAppendSequences(rows, sizes);
+        measureVectors(rows, sizes);
         return rows;
     }
 
-    private static void measureSortedMaps(List<MeasurementRow> rows) {
+    private static void measureSortedMaps(List<MeasurementRow> rows, int[] sizes) {
         for (String order : SORT_ORDERS) {
             for (String implementation : SORTED_MAP_IMPLEMENTATIONS) {
-                for (int size : SIZES) {
+                for (int size : sizes) {
                     rows.add(measure(
                             "DoubleObjectPersistentSortedMap",
                             order,
                             implementation,
                             size,
-                            BenchmarkFixtures.buildDoubleObjectPersistentSortedMap(
-                                    implementation,
-                                    order,
-                                    size,
-                                    BenchmarkValue::new)));
+                            retainSortedMapHistory(implementation, order, size)));
                 }
             }
         }
     }
 
-    private static void measureLongMaps(List<MeasurementRow> rows) {
+    private static void measureLongMaps(List<MeasurementRow> rows, int[] sizes) {
         for (String implementation : LONG_MAP_IMPLEMENTATIONS) {
-            for (int size : SIZES) {
+            for (int size : sizes) {
                 rows.add(measure(
                         "LongObjectPersistentMap",
                         "",
                         implementation,
                         size,
-                        BenchmarkFixtures.buildLongObjectPersistentMap(
-                                implementation,
-                                size,
-                                BenchmarkValue::new)));
+                        retainLongMapHistory(implementation, size)));
             }
         }
     }
 
-    private static void measureOrderedQueues(List<MeasurementRow> rows) {
+    private static void measureOrderedQueues(List<MeasurementRow> rows, int[] sizes) {
         for (String implementation : ORDERED_QUEUE_IMPLEMENTATIONS) {
-            for (int size : SIZES) {
+            for (int size : sizes) {
                 rows.add(measure(
                         "PersistentOrderedQueue",
                         "",
                         implementation,
                         size,
-                        BenchmarkFixtures.buildPersistentOrderedQueue(
-                                implementation,
-                                size,
-                                BenchmarkValue::new)));
+                        retainOrderedQueueHistory(implementation, size)));
             }
         }
     }
 
-    private static void measureAppendSequences(List<MeasurementRow> rows) {
+    private static void measureAppendSequences(List<MeasurementRow> rows, int[] sizes) {
         for (String implementation : APPEND_SEQUENCE_IMPLEMENTATIONS) {
-            for (int size : SIZES) {
+            for (int size : sizes) {
                 rows.add(measure(
                         "PersistentAppendSequence",
                         "",
                         implementation,
                         size,
-                        BenchmarkFixtures.buildPersistentAppendSequence(
-                                implementation,
-                                size,
-                                BenchmarkValue::new)));
+                        retainAppendSequenceHistory(implementation, size)));
             }
         }
     }
 
-    private static void measureVectors(List<MeasurementRow> rows) {
+    private static void measureVectors(List<MeasurementRow> rows, int[] sizes) {
         for (String implementation : VECTOR_IMPLEMENTATIONS) {
-            for (int size : SIZES) {
+            for (int size : sizes) {
                 rows.add(measure(
                         "PersistentVector",
                         "",
                         implementation,
                         size,
-                        BenchmarkFixtures.buildPersistentVector(
-                                implementation,
-                                size,
-                                BenchmarkValue::new)));
+                        retainVectorHistory(implementation, size)));
             }
         }
     }
@@ -204,6 +197,66 @@ public final class MemoryUsageReport {
                 structuralBytesPerElement,
                 objectCount,
                 structuralObjectCount);
+    }
+
+    private static Object retainSortedMapHistory(String implementation, String order, int size) {
+        List<Object> snapshots = new ArrayList<>(size + 1);
+        DoubleObjectPersistentSortedMap<BenchmarkValue> map =
+                BenchmarkFixtures.createDoubleObjectPersistentSortedMap(implementation, order);
+        snapshots.add(map);
+        for (int index = 0; index < size; index++) {
+            map = map.put(index, new BenchmarkValue(index));
+            snapshots.add(map);
+        }
+        return new RetainedHistory(snapshots.toArray());
+    }
+
+    private static Object retainLongMapHistory(String implementation, int size) {
+        List<Object> snapshots = new ArrayList<>(size + 1);
+        LongObjectPersistentMap<BenchmarkValue> map =
+                BenchmarkFixtures.createLongObjectPersistentMap(implementation);
+        snapshots.add(map);
+        for (int index = 0; index < size; index++) {
+            map = map.put(index, new BenchmarkValue(index));
+            snapshots.add(map);
+        }
+        return new RetainedHistory(snapshots.toArray());
+    }
+
+    private static Object retainOrderedQueueHistory(String implementation, int size) {
+        List<Object> snapshots = new ArrayList<>(size + 1);
+        PersistentOrderedQueue<BenchmarkValue> queue =
+                BenchmarkFixtures.createPersistentOrderedQueue(implementation);
+        snapshots.add(queue);
+        for (int index = 0; index < size; index++) {
+            queue = queue.add(new BenchmarkValue(index));
+            snapshots.add(queue);
+        }
+        return new RetainedHistory(snapshots.toArray());
+    }
+
+    private static Object retainAppendSequenceHistory(String implementation, int size) {
+        List<Object> snapshots = new ArrayList<>(size + 1);
+        PersistentAppendSequence<BenchmarkValue> sequence =
+                BenchmarkFixtures.createPersistentAppendSequence(implementation);
+        snapshots.add(sequence);
+        for (int index = 0; index < size; index++) {
+            sequence = sequence.append(new BenchmarkValue(index));
+            snapshots.add(sequence);
+        }
+        return new RetainedHistory(snapshots.toArray());
+    }
+
+    private static Object retainVectorHistory(String implementation, int size) {
+        List<Object> snapshots = new ArrayList<>(size + 1);
+        PersistentVector<BenchmarkValue> vector =
+                BenchmarkFixtures.createPersistentVector(implementation);
+        snapshots.add(vector);
+        for (int index = 0; index < size; index++) {
+            vector = vector.append(new BenchmarkValue(index));
+            snapshots.add(vector);
+        }
+        return new RetainedHistory(snapshots.toArray());
     }
 
     private static Path resolveResultsDirectory() {
@@ -238,6 +291,20 @@ public final class MemoryUsageReport {
         @Override
         public int compareTo(BenchmarkValue other) {
             return Integer.compare(id, other.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return id;
+        }
+    }
+
+    private static final class RetainedHistory {
+
+        private final Object[] snapshots;
+
+        private RetainedHistory(Object[] snapshots) {
+            this.snapshots = snapshots;
         }
     }
 }

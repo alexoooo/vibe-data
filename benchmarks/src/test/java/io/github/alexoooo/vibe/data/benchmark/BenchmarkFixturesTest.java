@@ -16,7 +16,7 @@ class BenchmarkFixturesTest {
 
     @Test
     void buildsLongMapsForEveryImplementation() {
-        for (String implementation : List.of("simple", "hamt", "dexx", "bifurcan", "bifurcanMap")) {
+        for (String implementation : List.of("simple", "hamt", "compact", "dexx", "bifurcan", "bifurcanMap")) {
             LongObjectPersistentMap<String> map =
                     BenchmarkFixtures.buildLongObjectPersistentMap(implementation, 8, index -> "value-" + index);
 
@@ -27,7 +27,7 @@ class BenchmarkFixturesTest {
 
     @Test
     void buildsSortedMapsForEveryImplementationAndOrder() {
-        for (String implementation : List.of("simple", "treap", "dexx", "bifurcanSorted", "bifurcanFloat")) {
+        for (String implementation : List.of("simple", "treap", "compact", "dexx", "bifurcanSorted", "bifurcanFloat")) {
             assertSortedOrder(implementation, "ascending", List.of("value-6", "value-7"));
             assertSortedOrder(implementation, "descending", List.of("value-7", "value-6"));
         }
@@ -35,7 +35,7 @@ class BenchmarkFixturesTest {
 
     @Test
     void buildsOrderedQueuesForEveryImplementation() {
-        for (String implementation : List.of("simple", "treap", "dexx", "bifurcan")) {
+        for (String implementation : List.of("simple", "treap", "compact", "dexx", "bifurcan")) {
             PersistentOrderedQueue<TestValue> queue =
                     BenchmarkFixtures.buildPersistentOrderedQueue(implementation, 8, TestValue::new);
 

@@ -29,14 +29,17 @@ On Windows, use:
 
 - `DoubleObjectSortedMap<T>`
 - `DoubleObjectPersistentSortedMap<T>`
+- `CompactDoubleObjectPersistentSortedMap<T>`
 - `SimpleDoubleObjectPersistentSortedMap<T>`
 - `TreapDoubleObjectPersistentSortedMap<T>`
 - `LongObjectMap<T>`
 - `LongObjectPersistentMap<T>`
+- `CompactLongObjectPersistentMap<T>`
 - `SimpleLongObjectPersistentMap<T>`
 - `HamtLongObjectPersistentMap<T>`
 - `OrderedQueue<T>`
 - `PersistentOrderedQueue<T>`
+- `CompactPersistentOrderedQueue<T>`
 - `SimplePersistentOrderedQueue<T>`
 - `TreapPersistentOrderedQueue<T>`
 - `PersistentAppendSequence<T>`
@@ -193,14 +196,47 @@ The benchmark suite includes both single-operation microbenchmarks and mixed rea
 
 Saved benchmark result snapshots live under `benchmarks/src/main/resources/results/` with timestamped filenames.
 
+### Performance benchmark summary
+
+Generate fresh JMH CSV snapshots for all five public benchmark families, then build the checked-in Markdown summary:
+
+```powershell
+$timestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH-mm-ssZ')
+$resultsDir = Join-Path $PWD 'benchmarks\src\main\resources\results'
+$cpFile = Join-Path $env:TEMP 'vibe-data-benchmarks-classpath.txt'
+
+.\mvnw.cmd -q -pl benchmarks -am package dependency:build-classpath "-Dmdep.outputFile=$cpFile" -Dmdep.pathSeparator=';' -Dmdep.includeScope=runtime
+
+Push-Location benchmarks\target
+java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-double-object-persistent-sorted-map.csv")
+java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.LongObjectPersistentMapBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-long-object-persistent-map.csv")
+java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.PersistentOrderedQueueBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-persistent-ordered-queue.csv")
+java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.PersistentAppendSequenceBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-persistent-append-sequence.csv")
+java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.PersistentVectorBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-persistent-vector.csv")
+Pop-Location
+
+$cp = "benchmarks\target\classes;vibe-data\target\classes;" + (Get-Content $cpFile -Raw).Trim()
+java -cp $cp io.github.alexoooo.vibe.data.benchmark.PerformanceBenchmarkReport `
+    (Join-Path $resultsDir "$timestamp-double-object-persistent-sorted-map.csv") `
+    (Join-Path $resultsDir "$timestamp-long-object-persistent-map.csv") `
+    (Join-Path $resultsDir "$timestamp-persistent-ordered-queue.csv") `
+    (Join-Path $resultsDir "$timestamp-persistent-append-sequence.csv") `
+    (Join-Path $resultsDir "$timestamp-persistent-vector.csv")
+```
+
+The report writes a normalized timestamped summary CSV and refreshes `benchmarks/src/main/resources/results/performance-benchmark-summary.md`.
+
 ### Memory usage report
 
 Generate the retained-heap comparison report:
 
 ```powershell
-.\mvnw.cmd -f benchmarks\pom.xml -am -DskipTests -Dexec.mainClass=io.github.alexoooo.vibe.data.benchmark.MemoryUsageReport org.codehaus.mojo:exec-maven-plugin:3.5.0:java
+$cpFile = Join-Path $env:TEMP 'vibe-data-benchmarks-classpath.txt'
+.\mvnw.cmd -q -pl benchmarks -am compile dependency:build-classpath "-Dmdep.outputFile=$cpFile" -Dmdep.pathSeparator=';' -Dmdep.includeScope=runtime
+$cp = "benchmarks\target\classes;vibe-data\target\classes;" + (Get-Content $cpFile -Raw).Trim()
+java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED -cp $cp io.github.alexoooo.vibe.data.benchmark.MemoryUsageReport
 ```
 
-Or run `io.github.alexoooo.vibe.data.benchmark.MemoryUsageReport.main()` directly from an IDE.
+Or run `io.github.alexoooo.vibe.data.benchmark.MemoryUsageReport.main()` directly from an IDE with the same `--add-opens` JVM options.
 
-The command writes a timestamped CSV snapshot and refreshes the checked-in Markdown summary at `benchmarks/src/main/resources/results/memory-usage-summary.md`. The report captures retained bytes, a structural-bytes view with the shared payload cost removed, and the JVM layout details used for the run.
+The command writes a timestamped CSV snapshot and refreshes the checked-in Markdown summary at `benchmarks/src/main/resources/results/memory-usage-summary.md`. The report captures retained bytes for the full mutation history (empty version through the final version), a structural-bytes view with the shared payload cost removed, and the JVM layout details used for the run.

@@ -121,7 +121,7 @@ public class PersistentOrderedQueueBenchmark {
     @State(Scope.Thread)
     public static class QueueState {
 
-        @Param({"simple", "treap", "dexx", "bifurcan"})
+        @Param({"simple", "treap", "compact", "dexx", "bifurcan"})
         public String implementation;
 
         @Param({"128", "4096"})
