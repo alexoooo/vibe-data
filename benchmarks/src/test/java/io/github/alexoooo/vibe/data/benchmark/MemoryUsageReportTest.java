@@ -15,11 +15,12 @@ class MemoryUsageReportTest {
     void measuresRealRowsForAllConfiguredImplementations() {
         List<MemoryUsageReport.MeasurementRow> rows = MemoryUsageReport.measureAll(new int[] {0, 128});
 
-        assertEquals(64, rows.size());
+        assertEquals(74, rows.size());
         assertFalse(rows.isEmpty());
         assertEquals(
                 Set.of(
                         "DoubleObjectPersistentSortedMap",
+                        "IntObjectPersistentMap",
                         "LongObjectPersistentMap",
                         "PersistentOrderedQueue",
                         "PersistentAppendSequence",

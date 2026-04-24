@@ -1,6 +1,7 @@
 package io.github.alexoooo.vibe.data.benchmark;
 
 import io.github.alexoooo.vibe.data.DoubleObjectPersistentSortedMap;
+import io.github.alexoooo.vibe.data.IntObjectPersistentMap;
 import io.github.alexoooo.vibe.data.LongObjectPersistentMap;
 import io.github.alexoooo.vibe.data.PersistentAppendSequence;
 import io.github.alexoooo.vibe.data.PersistentOrderedQueue;
@@ -22,6 +23,8 @@ public final class MemoryUsageReport {
 
     private static final String[] APPEND_SEQUENCE_IMPLEMENTATIONS =
             {"simple", "chunkedVector", "chunkedAppend", "bifurcan", "dexx"};
+    private static final String[] INT_MAP_IMPLEMENTATIONS =
+            {"simple", "hamt", "dexx", "bifurcan", "bifurcanMap"};
     private static final String[] LONG_MAP_IMPLEMENTATIONS =
             {"simple", "hamt", "compact", "dexx", "bifurcan", "bifurcanMap"};
     private static final String[] ORDERED_QUEUE_IMPLEMENTATIONS = {"simple", "treap", "compact", "dexx", "bifurcan"};
@@ -97,6 +100,7 @@ public final class MemoryUsageReport {
     static List<MeasurementRow> measureAll(int[] sizes) {
         List<MeasurementRow> rows = new ArrayList<>();
         measureSortedMaps(rows, sizes);
+        measureIntMaps(rows, sizes);
         measureLongMaps(rows, sizes);
         measureOrderedQueues(rows, sizes);
         measureAppendSequences(rows, sizes);
@@ -115,6 +119,19 @@ public final class MemoryUsageReport {
                             size,
                             retainSortedMapHistory(implementation, order, size)));
                 }
+            }
+        }
+    }
+
+    private static void measureIntMaps(List<MeasurementRow> rows, int[] sizes) {
+        for (String implementation : INT_MAP_IMPLEMENTATIONS) {
+            for (int size : sizes) {
+                rows.add(measure(
+                        "IntObjectPersistentMap",
+                        "",
+                        implementation,
+                        size,
+                        retainIntMapHistory(implementation, size)));
             }
         }
     }
@@ -203,6 +220,18 @@ public final class MemoryUsageReport {
         List<Object> snapshots = new ArrayList<>(size + 1);
         DoubleObjectPersistentSortedMap<BenchmarkValue> map =
                 BenchmarkFixtures.createDoubleObjectPersistentSortedMap(implementation, order);
+        snapshots.add(map);
+        for (int index = 0; index < size; index++) {
+            map = map.put(index, new BenchmarkValue(index));
+            snapshots.add(map);
+        }
+        return new RetainedHistory(snapshots.toArray());
+    }
+
+    private static Object retainIntMapHistory(String implementation, int size) {
+        List<Object> snapshots = new ArrayList<>(size + 1);
+        IntObjectPersistentMap<BenchmarkValue> map =
+                BenchmarkFixtures.createIntObjectPersistentMap(implementation);
         snapshots.add(map);
         for (int index = 0; index < size; index++) {
             map = map.put(index, new BenchmarkValue(index));

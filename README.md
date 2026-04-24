@@ -2,7 +2,7 @@
 
 `vibe-data` is a Java 25 multi-module Maven project for persistent data structures, including primitive-specialized map types, ordered-set-like queues, and append-only generic sequence/vector types.
 
-The main library artifact is `io.github.alexoooo:vibe-data`. It currently provides persistent sorted maps with primitive `double` keys and object values, unordered persistent maps with primitive `long` keys and object values, ordered queues with comparator-aware factories, and append-only generic sequences/vectors in package `io.github.alexoooo.vibe.data`, with JSpecify nullability annotations, JUnit 5 tests, and a separate JMH benchmark module.
+The main library artifact is `io.github.alexoooo:vibe-data`. It currently provides persistent sorted maps with primitive `double` keys and object values, unordered persistent maps with primitive `int` or `long` keys and object values, ordered queues with comparator-aware factories, and append-only generic sequences/vectors in package `io.github.alexoooo.vibe.data`, with JSpecify nullability annotations, JUnit 5 tests, and a separate JMH benchmark module.
 
 ## Build
 
@@ -37,6 +37,10 @@ On Windows, use:
 - `CompactLongObjectPersistentMap<T>`
 - `SimpleLongObjectPersistentMap<T>`
 - `HamtLongObjectPersistentMap<T>`
+- `IntObjectMap<T>`
+- `IntObjectPersistentMap<T>`
+- `SimpleIntObjectPersistentMap<T>`
+- `HamtIntObjectPersistentMap<T>`
 - `OrderedQueue<T>`
 - `PersistentOrderedQueue<T>`
 - `CompactPersistentOrderedQueue<T>`
@@ -190,7 +194,7 @@ Then run the packaged JMH jar from the target directory, keeping the generated `
 java -jar benchmarks/target/benchmarks.jar
 ```
 
-Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.LongObjectPersistentMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.PersistentOrderedQueueBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.PersistentAppendSequenceBenchmark.main()`, or `io.github.alexoooo.vibe.data.benchmark.PersistentVectorBenchmark.main()` directly from an IDE to launch those benchmark classes without building a custom JMH command line.
+Or run `io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.IntObjectPersistentMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.LongObjectPersistentMapBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.PersistentOrderedQueueBenchmark.main()`, `io.github.alexoooo.vibe.data.benchmark.PersistentAppendSequenceBenchmark.main()`, or `io.github.alexoooo.vibe.data.benchmark.PersistentVectorBenchmark.main()` directly from an IDE to launch those benchmark classes without building a custom JMH command line.
 
 The benchmark suite includes both single-operation microbenchmarks and mixed read/write workloads across the library implementations plus benchmark-only comparison wrappers.
 
@@ -198,7 +202,7 @@ Saved benchmark result snapshots live under `benchmarks/src/main/resources/resul
 
 ### Performance benchmark summary
 
-Generate fresh JMH CSV snapshots for all five public benchmark families, then build the checked-in Markdown summary:
+Generate fresh JMH CSV snapshots for all six public benchmark families, then build the checked-in Markdown summary:
 
 ```powershell
 $timestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH-mm-ssZ')
@@ -209,6 +213,7 @@ $cpFile = Join-Path $env:TEMP 'vibe-data-benchmarks-classpath.txt'
 
 Push-Location benchmarks\target
 java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-double-object-persistent-sorted-map.csv")
+java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.IntObjectPersistentMapBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-int-object-persistent-map.csv")
 java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.LongObjectPersistentMapBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-long-object-persistent-map.csv")
 java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.PersistentOrderedQueueBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-persistent-ordered-queue.csv")
 java -jar benchmarks.jar io.github.alexoooo.vibe.data.benchmark.PersistentAppendSequenceBenchmark.* -foe true -rf csv -rff (Join-Path $resultsDir "$timestamp-persistent-append-sequence.csv")
@@ -218,6 +223,7 @@ Pop-Location
 $cp = "benchmarks\target\classes;vibe-data\target\classes;" + (Get-Content $cpFile -Raw).Trim()
 java -cp $cp io.github.alexoooo.vibe.data.benchmark.PerformanceBenchmarkReport `
     (Join-Path $resultsDir "$timestamp-double-object-persistent-sorted-map.csv") `
+    (Join-Path $resultsDir "$timestamp-int-object-persistent-map.csv") `
     (Join-Path $resultsDir "$timestamp-long-object-persistent-map.csv") `
     (Join-Path $resultsDir "$timestamp-persistent-ordered-queue.csv") `
     (Join-Path $resultsDir "$timestamp-persistent-append-sequence.csv") `

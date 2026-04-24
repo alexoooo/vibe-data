@@ -3,6 +3,7 @@ package io.github.alexoooo.vibe.data.benchmark;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.github.alexoooo.vibe.data.DoubleObjectPersistentSortedMap;
+import io.github.alexoooo.vibe.data.IntObjectPersistentMap;
 import io.github.alexoooo.vibe.data.LongObjectPersistentMap;
 import io.github.alexoooo.vibe.data.PersistentAppendSequence;
 import io.github.alexoooo.vibe.data.PersistentOrderedQueue;
@@ -22,6 +23,17 @@ class BenchmarkFixturesTest {
 
             assertEquals(8, map.size(), implementation);
             assertEquals("value-3", map.find(3L), implementation);
+        }
+    }
+
+    @Test
+    void buildsIntMapsForEveryImplementation() {
+        for (String implementation : List.of("simple", "hamt", "dexx", "bifurcan", "bifurcanMap")) {
+            IntObjectPersistentMap<String> map =
+                    BenchmarkFixtures.buildIntObjectPersistentMap(implementation, 8, index -> "value-" + index);
+
+            assertEquals(8, map.size(), implementation);
+            assertEquals("value-3", map.find(3), implementation);
         }
     }
 

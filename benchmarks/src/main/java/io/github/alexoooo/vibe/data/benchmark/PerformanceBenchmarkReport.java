@@ -18,6 +18,7 @@ public final class PerformanceBenchmarkReport {
 
     private static final String[] EXPECTED_RESULT_SUFFIXES = {
         "double-object-persistent-sorted-map.csv",
+        "int-object-persistent-map.csv",
         "long-object-persistent-map.csv",
         "persistent-ordered-queue.csv",
         "persistent-append-sequence.csv",
@@ -158,6 +159,7 @@ public final class PerformanceBenchmarkReport {
     private static String interfaceNameForBenchmarkClass(String benchmarkClassSimpleName) {
         return switch (benchmarkClassSimpleName) {
             case "DoubleObjectPersistentSortedMapBenchmark" -> "DoubleObjectPersistentSortedMap";
+            case "IntObjectPersistentMapBenchmark" -> "IntObjectPersistentMap";
             case "LongObjectPersistentMapBenchmark" -> "LongObjectPersistentMap";
             case "PersistentOrderedQueueBenchmark" -> "PersistentOrderedQueue";
             case "PersistentAppendSequenceBenchmark" -> "PersistentAppendSequence";

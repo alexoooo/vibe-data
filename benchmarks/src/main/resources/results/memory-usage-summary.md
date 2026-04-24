@@ -1,7 +1,7 @@
 # Memory usage summary
 
-- Generated: `2026-04-19T23:13:40.0295145Z`
-- Source CSV: [`2026-04-19T23-13-40Z-memory-usage.csv`](./2026-04-19T23-13-40Z-memory-usage.csv)
+- Generated: `2026-04-20T03:10:58.1260849Z`
+- Source CSV: [`2026-04-20T03-10-58Z-memory-usage.csv`](./2026-04-20T03-10-58Z-memory-usage.csv)
 - Java: `25.0.1` (`OpenJDK 64-Bit Server VM`, `Eclipse Adoptium`)
 - OS: `Windows 11 10.0`
 - Measured sizes: `0`, `128`, `4096`
@@ -20,7 +20,7 @@
 ```text
 # VM mode: 64 bits
 # Compressed references (oops): 3-bit shift
-# Compressed class pointers: 0-bit shift and 0x27000000 base
+# Compressed class pointers: 0-bit shift and 0x2F000000 base
 # Object alignment: 8 bytes
 #                       ref, bool, byte, char, shrt,  int,  flt,  lng,  dbl
 # Field sizes:            4,    1,    1,    2,    2,    4,    4,    8,    8
@@ -99,6 +99,38 @@
 | 4 | bifurcanSorted | 3031992 | 2966456 | 740.232 | 724.232 | 81949 |
 | 5 | bifurcanFloat | 4273792 | 4208256 | 1043.406 | 1027.406 | 76509 |
 | 6 | simple | 336167024 | 336101488 | 82072.027 | 82056.027 | 8411140 |
+
+## IntObjectPersistentMap
+
+#### size = 0
+
+| Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | dexx | 88 | 88 | - | - | 5 |
+| 2 | simple | 104 | 104 | - | - | 4 |
+| 3 | bifurcanMap | 232 | 232 | - | - | 10 |
+| 4 | hamt | 288 | 288 | - | - | 7 |
+| 5 | bifurcan | 344 | 344 | - | - | 12 |
+
+#### size = 128
+
+| Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | hamt | 32624 | 30576 | 254.875 | 238.875 | 650 |
+| 2 | dexx | 35728 | 33680 | 279.125 | 263.125 | 1106 |
+| 3 | bifurcan | 56288 | 54240 | 439.750 | 423.750 | 1226 |
+| 4 | bifurcanMap | 78072 | 76024 | 609.938 | 593.938 | 1322 |
+| 5 | simple | 346776 | 344728 | 2709.188 | 2693.188 | 9027 |
+
+#### size = 4096
+
+| Rank | Implementation | Retained bytes | Structural bytes | Retained bytes/element | Structural bytes/element | Objects |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | hamt | 1045872 | 980336 | 255.340 | 239.340 | 20709 |
+| 2 | dexx | 1820184 | 1754648 | 444.381 | 428.381 | 43482 |
+| 3 | bifurcan | 2929760 | 2864224 | 715.273 | 699.273 | 51010 |
+| 4 | bifurcanMap | 4351736 | 4286200 | 1062.436 | 1046.436 | 54186 |
+| 5 | simple | 336150680 | 336085144 | 82068.037 | 82052.037 | 8415235 |
 
 ## LongObjectPersistentMap
 

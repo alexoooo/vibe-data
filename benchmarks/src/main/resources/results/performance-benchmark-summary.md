@@ -1,9 +1,10 @@
 # Performance benchmark summary
 
-- Generated: `2026-04-19T23:50:02.234566Z`
-- Summary CSV: [`2026-04-19T23-50-02Z-performance-benchmark-summary.csv`](./2026-04-19T23-50-02Z-performance-benchmark-summary.csv)
+- Generated: `2026-04-20T03:10:47.9528648Z`
+- Summary CSV: [`2026-04-20T03-10-47Z-performance-benchmark-summary.csv`](./2026-04-20T03-10-47Z-performance-benchmark-summary.csv)
 - Source JMH CSVs:
   - [`2026-04-19T23-36-09Z-double-object-persistent-sorted-map.csv`](./2026-04-19T23-36-09Z-double-object-persistent-sorted-map.csv)
+  - [`2026-04-20T03-05-35Z-int-object-persistent-map.csv`](./2026-04-20T03-05-35Z-int-object-persistent-map.csv)
   - [`2026-04-19T23-36-09Z-long-object-persistent-map.csv`](./2026-04-19T23-36-09Z-long-object-persistent-map.csv)
   - [`2026-04-19T23-36-09Z-persistent-ordered-queue.csv`](./2026-04-19T23-36-09Z-persistent-ordered-queue.csv)
   - [`2026-04-19T23-36-09Z-persistent-append-sequence.csv`](./2026-04-19T23-36-09Z-persistent-append-sequence.csv)
@@ -455,6 +456,206 @@
 | 4 | bifurcanSorted | 0.740 | 0.157 | 4 | ns/op |
 | 5 | bifurcanFloat | 1.316 | 0.117 | 4 | ns/op |
 | 6 | dexx | 7492.717 | 3316.229 | 4 | ns/op |
+
+## IntObjectPersistentMap
+
+#### findExisting
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 5.406 | 2.387 | 4 | ns/op |
+| 2 | simple | 7.476 | 5.577 | 4 | ns/op |
+| 3 | bifurcan | 11.610 | 3.291 | 4 | ns/op |
+| 4 | bifurcanMap | 13.803 | 3.622 | 4 | ns/op |
+| 5 | dexx | 28.522 | 18.827 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | simple | 6.689 | 1.250 | 4 | ns/op |
+| 2 | hamt | 9.466 | 1.694 | 4 | ns/op |
+| 3 | bifurcan | 18.083 | 5.121 | 4 | ns/op |
+| 4 | bifurcanMap | 21.406 | 12.944 | 4 | ns/op |
+| 5 | dexx | 33.836 | 39.553 | 4 | ns/op |
+
+#### findMissing
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 1.831 | 0.642 | 4 | ns/op |
+| 2 | bifurcan | 2.848 | 0.414 | 4 | ns/op |
+| 3 | simple | 4.749 | 5.217 | 4 | ns/op |
+| 4 | dexx | 7.947 | 7.235 | 4 | ns/op |
+| 5 | bifurcanMap | 9.611 | 3.525 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 1.668 | 0.311 | 4 | ns/op |
+| 2 | simple | 5.037 | 6.891 | 4 | ns/op |
+| 3 | bifurcanMap | 14.876 | 4.355 | 4 | ns/op |
+| 4 | bifurcan | 17.845 | 3.955 | 4 | ns/op |
+| 5 | dexx | 30.791 | 36.746 | 4 | ns/op |
+
+#### iterateAll
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 541.455 | 112.336 | 4 | ns/op |
+| 2 | simple | 604.673 | 181.081 | 4 | ns/op |
+| 3 | bifurcanMap | 693.106 | 130.231 | 4 | ns/op |
+| 4 | bifurcan | 3493.973 | 1080.349 | 4 | ns/op |
+| 5 | dexx | 6396.420 | 3465.623 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 14956.290 | 2770.180 | 4 | ns/op |
+| 2 | bifurcanMap | 22564.005 | 5384.220 | 4 | ns/op |
+| 3 | simple | 39676.373 | 6589.016 | 4 | ns/op |
+| 4 | bifurcan | 93543.264 | 29314.940 | 4 | ns/op |
+| 5 | dexx | 201312.375 | 116531.715 | 4 | ns/op |
+
+#### mixedReadHeavy
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 1852.444 | 2183.467 | 4 | ns/op |
+| 2 | bifurcan | 3368.297 | 4476.743 | 4 | ns/op |
+| 3 | bifurcanMap | 4361.459 | 7343.608 | 4 | ns/op |
+| 4 | dexx | 5038.395 | 7949.975 | 4 | ns/op |
+| 5 | simple | 28377.165 | 54067.715 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 2151.017 | 3064.596 | 4 | ns/op |
+| 2 | bifurcan | 5504.477 | 8071.433 | 4 | ns/op |
+| 3 | dexx | 8547.018 | 15485.301 | 4 | ns/op |
+| 4 | bifurcanMap | 9070.213 | 11926.663 | 4 | ns/op |
+| 5 | simple | 674495.329 | 366531.952 | 4 | ns/op |
+
+#### mixedUpdateHeavy
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 13504.748 | 22646.413 | 4 | ns/op |
+| 2 | dexx | 23660.756 | 33069.887 | 4 | ns/op |
+| 3 | bifurcanMap | 37064.883 | 69117.497 | 4 | ns/op |
+| 4 | bifurcan | 41982.776 | 50854.074 | 4 | ns/op |
+| 5 | simple | 384885.523 | 371744.899 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 18676.185 | 36189.181 | 4 | ns/op |
+| 2 | dexx | 30779.498 | 70192.537 | 4 | ns/op |
+| 3 | bifurcan | 43939.146 | 68050.701 | 4 | ns/op |
+| 4 | bifurcanMap | 62850.013 | 126468.058 | 4 | ns/op |
+| 5 | simple | 9101740.561 | 8575001.743 | 4 | ns/op |
+
+#### putExisting
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 93.571 | 127.432 | 4 | ns/op |
+| 2 | dexx | 105.058 | 117.423 | 4 | ns/op |
+| 3 | bifurcan | 177.031 | 193.785 | 4 | ns/op |
+| 4 | bifurcanMap | 197.043 | 286.896 | 4 | ns/op |
+| 5 | simple | 3248.949 | 6318.578 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 135.802 | 207.622 | 4 | ns/op |
+| 2 | dexx | 181.124 | 345.997 | 4 | ns/op |
+| 3 | bifurcanMap | 288.991 | 466.695 | 4 | ns/op |
+| 4 | bifurcan | 470.871 | 1549.166 | 4 | ns/op |
+| 5 | simple | 85988.005 | 9302.961 | 4 | ns/op |
+
+#### putNew
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 11.982 | 16.336 | 4 | ns/op |
+| 2 | dexx | 165.881 | 274.089 | 4 | ns/op |
+| 3 | bifurcan | 508.675 | 358.068 | 4 | ns/op |
+| 4 | bifurcanMap | 685.484 | 701.237 | 4 | ns/op |
+| 5 | simple | 3074.549 | 7066.690 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 13.369 | 16.788 | 4 | ns/op |
+| 2 | bifurcan | 119.957 | 149.480 | 4 | ns/op |
+| 3 | dexx | 230.606 | 457.403 | 4 | ns/op |
+| 4 | bifurcanMap | 703.309 | 1000.328 | 4 | ns/op |
+| 5 | simple | 79756.632 | 24495.539 | 4 | ns/op |
+
+#### removeExisting
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 94.024 | 115.152 | 4 | ns/op |
+| 2 | dexx | 156.191 | 333.505 | 4 | ns/op |
+| 3 | bifurcanMap | 328.806 | 286.832 | 4 | ns/op |
+| 4 | bifurcan | 688.641 | 597.087 | 4 | ns/op |
+| 5 | simple | 2987.382 | 4506.110 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 163.776 | 194.584 | 4 | ns/op |
+| 2 | dexx | 206.916 | 486.060 | 4 | ns/op |
+| 3 | bifurcanMap | 456.158 | 1476.836 | 4 | ns/op |
+| 4 | bifurcan | 1010.450 | 1227.718 | 4 | ns/op |
+| 5 | simple | 81791.077 | 24763.827 | 4 | ns/op |
+
+#### size
+
+##### size = 128
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 1.727 | 0.354 | 4 | ns/op |
+| 2 | bifurcanMap | 1.930 | 0.782 | 4 | ns/op |
+| 3 | simple | 2.040 | 1.278 | 4 | ns/op |
+| 4 | bifurcan | 2.569 | 0.681 | 4 | ns/op |
+| 5 | dexx | 4.141 | 4.776 | 4 | ns/op |
+
+##### size = 4096
+
+| Rank | Implementation | Score | Score Error (99.9%) | Samples | Unit |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | hamt | 1.770 | 0.177 | 4 | ns/op |
+| 2 | simple | 1.843 | 0.965 | 4 | ns/op |
+| 3 | bifurcanMap | 2.008 | 0.396 | 4 | ns/op |
+| 4 | bifurcan | 2.644 | 0.497 | 4 | ns/op |
+| 5 | dexx | 2.893 | 1.042 | 4 | ns/op |
 
 ## LongObjectPersistentMap
 

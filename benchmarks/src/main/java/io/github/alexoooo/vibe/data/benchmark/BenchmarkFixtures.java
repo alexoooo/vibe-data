@@ -6,11 +6,14 @@ import io.github.alexoooo.vibe.data.CompactDoubleObjectPersistentSortedMap;
 import io.github.alexoooo.vibe.data.CompactLongObjectPersistentMap;
 import io.github.alexoooo.vibe.data.CompactPersistentOrderedQueue;
 import io.github.alexoooo.vibe.data.DoubleObjectPersistentSortedMap;
+import io.github.alexoooo.vibe.data.HamtIntObjectPersistentMap;
 import io.github.alexoooo.vibe.data.HamtLongObjectPersistentMap;
+import io.github.alexoooo.vibe.data.IntObjectPersistentMap;
 import io.github.alexoooo.vibe.data.LongObjectPersistentMap;
 import io.github.alexoooo.vibe.data.PersistentAppendSequence;
 import io.github.alexoooo.vibe.data.PersistentOrderedQueue;
 import io.github.alexoooo.vibe.data.PersistentVector;
+import io.github.alexoooo.vibe.data.SimpleIntObjectPersistentMap;
 import io.github.alexoooo.vibe.data.SimpleDoubleObjectPersistentSortedMap;
 import io.github.alexoooo.vibe.data.SimpleLongObjectPersistentMap;
 import io.github.alexoooo.vibe.data.SimplePersistentAppendSequence;
@@ -42,6 +45,17 @@ final class BenchmarkFixtures {
             int size,
             IntFunction<? extends T> valueFactory) {
         LongObjectPersistentMap<T> map = createLongObjectPersistentMap(implementation);
+        for (int index = 0; index < size; index++) {
+            map = map.put(index, valueFactory.apply(index));
+        }
+        return map;
+    }
+
+    static <T> IntObjectPersistentMap<T> buildIntObjectPersistentMap(
+            String implementation,
+            int size,
+            IntFunction<? extends T> valueFactory) {
+        IntObjectPersistentMap<T> map = createIntObjectPersistentMap(implementation);
         for (int index = 0; index < size; index++) {
             map = map.put(index, valueFactory.apply(index));
         }
@@ -115,6 +129,17 @@ final class BenchmarkFixtures {
             case "dexx" -> DexxLongObjectPersistentMap.<T>empty();
             case "bifurcan" -> BifurcanIntMapLongObjectPersistentMap.<T>empty();
             case "bifurcanMap" -> BifurcanMapLongObjectPersistentMap.<T>empty();
+            default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
+        };
+    }
+
+    static <T> IntObjectPersistentMap<T> createIntObjectPersistentMap(String implementation) {
+        return switch (implementation) {
+            case "simple" -> SimpleIntObjectPersistentMap.<T>empty();
+            case "hamt" -> HamtIntObjectPersistentMap.<T>empty();
+            case "dexx" -> DexxIntObjectPersistentMap.<T>empty();
+            case "bifurcan" -> BifurcanIntMapIntObjectPersistentMap.<T>empty();
+            case "bifurcanMap" -> BifurcanMapIntObjectPersistentMap.<T>empty();
             default -> throw new IllegalArgumentException("Unknown implementation: " + implementation);
         };
     }

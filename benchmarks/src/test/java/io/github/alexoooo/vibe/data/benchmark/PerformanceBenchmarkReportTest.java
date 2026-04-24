@@ -12,7 +12,7 @@ class PerformanceBenchmarkReportTest {
         String csv = """
                 "Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: implementation","Param: order","Param: size"
                 "io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.putNew","avgt",1,4,42.125,3.500,"ns/op",compact,ascending,4096
-                "io.github.alexoooo.vibe.data.benchmark.DoubleObjectPersistentSortedMapBenchmark.putNew","avgt",1,4,55.750,4.000,"ns/op",treap,descending,128
+                "io.github.alexoooo.vibe.data.benchmark.IntObjectPersistentMapBenchmark.putNew","avgt",1,4,55.750,4.000,"ns/op",hamt,,128
                 """;
 
         List<PerformanceBenchmarkReport.MeasurementRow> rows =
@@ -32,7 +32,8 @@ class PerformanceBenchmarkReportTest {
                         "ns/op",
                         "example-double-object-persistent-sorted-map.csv"),
                 rows.get(0));
-        assertEquals("descending", rows.get(1).variant());
+        assertEquals("IntObjectPersistentMap", rows.get(1).interfaceName());
+        assertEquals("", rows.get(1).variant());
         assertEquals(128, rows.get(1).size());
     }
 }
